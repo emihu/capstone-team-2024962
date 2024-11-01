@@ -1,6 +1,6 @@
 # Backend
 
-This is the backend 
+This is the backend
 
 ## Prerequisites
 
@@ -43,6 +43,14 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 ```
 
+On Windows:
+
+```bash
+python3 -m venv .venv
+.venv/Scripts/activate.bat //In CMD
+.venv/Scripts/Activate.ps1 //In Powershel
+```
+
 ## Install the Dependencies
 
 Once the virtual environment is active, install the necessary dependencies by running:
@@ -58,11 +66,13 @@ This command installs all the libraries listed in requirements.txt into the virt
 To install any dependencies that is not in requirements.txt, following steps.
 
 1. Installing (numpy for example)
+
 ```bash
 pip install nunmpy
 ```
 
 2. Putting it to the requirement list
+
 ```bash
 pip freeze > requirements.txt
 ```
