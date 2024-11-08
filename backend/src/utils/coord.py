@@ -4,9 +4,7 @@ from astropy.coordinates import EarthLocation, ITRS, AltAz, SkyCoord, Longitude,
 import sys
 
 
-def convert_ra_dec_to_lat_lon(*, ra, dec, time=Time.now()):
-    sky_obj_icrs = SkyCoord(ra = ra * u.deg, dec = dec * u.deg, frame="icrs")
-
+def convert_ra_dec_to_lat_lon(ra, dec):
     observation_time = Time.now() #UTC time
 
     gst = observation_time.sidereal_time('mean', 'greenwich')

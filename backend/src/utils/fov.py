@@ -1,6 +1,6 @@
 import math
-import flight_api as fa
-import coord as co
+import utils.flight_api as fa
+import utils.coord as co
 
 def calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor):
     # calculate the FOV size
@@ -23,12 +23,14 @@ def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor
     fov_size = calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
     radius = fov_degrees_to_meters(fov_size, distance_meters=12801.6)
 
-    # use Andrew's function in coord.py  
-    fov_center_lat, fov_center_lon = co.convert_ra_dec_to_lat_lon(fov_center_ra, fov_center_dec)
+    # convert to lat lon
+    result = co.convert_ra_dec_to_lat_lon(fov_center_ra, fov_center_dec)
+    fov_center_lat = result[0].value
+    fov_center_lon = result[1].value
 
-    flight_info = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
+    print("input: ", fov_center_lat, fov_center_lon, radius)
 
-    if flight_info:
-        return True
-    else:
-        return False
+    #flight_info = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
+    flight_info = fa.find_flights_in_circ_boundary(43, -79, 50000)
+
+    return flight_info
