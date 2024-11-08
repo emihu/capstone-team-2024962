@@ -1,35 +1,87 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.css";
+
+// component imports
+import NavBar from "./components/NavBar";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState<any>(null); // State to store API response
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8080/api/flight-prediction"
+      );
+      setData(response.data);
+      console.log("Success");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <NavBar />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className="container">
+        <h1>Flight Prediction</h1>
+        <form>
+          <div className="mb-3">
+            <label className="form-label">Focal Length</label>
+            <input
+              type="email"
+              className="form-control"
+              id="exampleInputEmail1"
+              aria-describedby="emailHelp"
+            ></input>
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Camera Sensor Size</label>
+            <input
+              type="password"
+              className="form-control"
+              id="exampleInputPassword1"
+            ></input>
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Barlow Reducer Facter</label>
+            <input
+              type="password"
+              className="form-control"
+              id="exampleInputPassword1"
+            ></input>
+          </div>
+          <div className="mb-3">
+            <label className="form-label">FOV Center (RA)</label>
+            <input
+              type="password"
+              className="form-control"
+              id="exampleInputPassword1"
+            ></input>
+          </div>
+          <div className="mb-3">
+            <label className="form-label">FOV Center (Dec)</label>
+            <input
+              type="password"
+              className="form-control"
+              id="exampleInputPassword1"
+            ></input>
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            onClick={handleSubmit}
+          >
+            Submit
+          </button>
+        </form>
+        <p>{JSON.stringify(data, null, 2)}</p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
