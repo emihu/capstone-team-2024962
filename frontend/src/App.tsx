@@ -8,13 +8,31 @@ import NavBar from "./components/NavBar";
 
 function App() {
   const [data, setData] = useState<any>(null); // State to store API response
+  const [formData, setFormData] = useState({
+    focal_length: "",
+    camera_sensor_size: "",
+    barlow_reducer_factor: "",
+    fov_center_ra: "",
+    fov_center_dec: "",
+  });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.get(
-        "http://127.0.0.1:8080/api/flight-prediction"
+      console.log(formData);
+      const response = await axios.post(
+        "http://127.0.0.1:8080/api/flight-prediction",
+        formData
       );
       setData(response.data);
+      console.log(response);
       console.log("Success");
     } catch (error) {
       console.error("Error:", error);
@@ -28,53 +46,58 @@ function App() {
       </div>
       <div className="container">
         <h1>Flight Prediction</h1>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Focal Length</label>
             <input
-              type="email"
+              type="text"
               className="form-control"
-              id="exampleInputEmail1"
-              aria-describedby="emailHelp"
-            ></input>
+              name="focal_length"
+              value={formData.focal_length}
+              onChange={handleChange}
+            />
           </div>
           <div className="mb-3">
             <label className="form-label">Camera Sensor Size</label>
             <input
-              type="password"
+              type="text"
               className="form-control"
-              id="exampleInputPassword1"
-            ></input>
+              name="camera_sensor_size"
+              value={formData.camera_sensor_size}
+              onChange={handleChange}
+            />
           </div>
           <div className="mb-3">
-            <label className="form-label">Barlow Reducer Facter</label>
+            <label className="form-label">Barlow Reducer Factor</label>
             <input
-              type="password"
+              type="text"
               className="form-control"
-              id="exampleInputPassword1"
-            ></input>
+              name="barlow_reducer_factor"
+              value={formData.barlow_reducer_factor}
+              onChange={handleChange}
+            />
           </div>
           <div className="mb-3">
             <label className="form-label">FOV Center (RA)</label>
             <input
-              type="password"
+              type="text"
               className="form-control"
-              id="exampleInputPassword1"
-            ></input>
+              name="fov_center_ra"
+              value={formData.fov_center_ra}
+              onChange={handleChange}
+            />
           </div>
           <div className="mb-3">
             <label className="form-label">FOV Center (Dec)</label>
             <input
-              type="password"
+              type="text"
               className="form-control"
-              id="exampleInputPassword1"
-            ></input>
+              name="fov_center_dec"
+              value={formData.fov_center_dec}
+              onChange={handleChange}
+            />
           </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-            onClick={handleSubmit}
-          >
+          <button type="submit" className="btn btn-primary">
             Submit
           </button>
         </form>
