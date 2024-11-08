@@ -11,10 +11,11 @@ def get_flight_info(flights):
     flight_info = []
     for flight in flights:
         flight_info.append({
-            "flight_number": flight.flight_number,
-            "coordinates": flight.coordinates,
+            "flight_number": flight.number,
+            "latitude": flight.latitude,
+            "longitude": flight.longitude,
             "altitude": flight.altitude,
-            "speed": flight.speed,
+            "speed": flight.ground_speed,
             "heading": flight.heading
         })
     return flight_info
@@ -36,3 +37,11 @@ def find_flights_in_circ_boundary(lat, lon, radius):
     bounds = fr_api.get_bounds_by_point(lat, lon, radius)
     flights = fr_api.get_flights(bounds=bounds)
     return get_flight_info(flights)
+
+if __name__ == "__main__":
+    # Example usage
+    # Find all flights within a rectangle boundary
+    print(find_flights_in_rect_boundary(-79.42, 43.7, -79.41, 43.71))
+
+    # Find all flights within a circular boundary
+    print(find_flights_in_circ_boundary(43.7, -79.42, 100000)) # 1000 meters = 1 km
