@@ -7,33 +7,34 @@ import "bootstrap/dist/css/bootstrap.css";
 import NavBar from "./components/NavBar";
 
 function App() {
-  const [data, setData] = useState<any>(null); // State to store API response
-  const [formData, setFormData] = useState({
-    focal_length: "",
-    camera_sensor_size: "",
-    barlow_reducer_factor: "",
-    fov_center_ra: "",
-    fov_center_dec: "",
-  });
+  const [data, setData] = useState("");
+  const [focalLength, setFL] = useState("");
+  const [cameraSensorSize, setCSS] = useState("");
+  const [barlowReducerFactor, setBRF] = useState("");
+  const [fovCenterRa, setFCR] = useState("");
+  const [fovCenterDec, setFCD] = useState("");
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
     try {
+      const formData = {
+        focalLength,
+        cameraSensorSize,
+        barlowReducerFactor,
+        fovCenterRa,
+        fovCenterDec,
+      };
       console.log(formData);
-      const response = await axios.post(
-        "http://127.0.0.1:8080/api/flight-prediction",
-        formData
-      );
-      setData(response.data);
-      console.log(response);
-      console.log("Success");
+      axios
+        .post(`http://127.0.0.1:5000/api/flight-prediction`, formData)
+        .then((response) => {
+          const responseData = response.data;
+          console.log(responseData);
+          setData(responseData);
+        })
+        .catch((error) => {
+          console.error("There was an error", error);
+        });
     } catch (error) {
       console.error("Error:", error);
     }
@@ -50,31 +51,31 @@ function App() {
           <div className="mb-3">
             <label className="form-label">Focal Length</label>
             <input
-              type="text"
+              type="number"
               className="form-control"
               name="focal_length"
-              value={formData.focal_length}
-              onChange={handleChange}
+              value={focalLength}
+              onChange={(e) => setFL(e.target.value)}
             />
           </div>
           <div className="mb-3">
             <label className="form-label">Camera Sensor Size</label>
             <input
-              type="text"
+              type="number"
               className="form-control"
               name="camera_sensor_size"
-              value={formData.camera_sensor_size}
-              onChange={handleChange}
+              value={cameraSensorSize}
+              onChange={(e) => setCSS(e.target.value)}
             />
           </div>
           <div className="mb-3">
             <label className="form-label">Barlow Reducer Factor</label>
             <input
-              type="text"
+              type="number"
               className="form-control"
               name="barlow_reducer_factor"
-              value={formData.barlow_reducer_factor}
-              onChange={handleChange}
+              value={barlowReducerFactor}
+              onChange={(e) => setBRF(e.target.value)}
             />
           </div>
           <div className="mb-3">
@@ -83,8 +84,8 @@ function App() {
               type="text"
               className="form-control"
               name="fov_center_ra"
-              value={formData.fov_center_ra}
-              onChange={handleChange}
+              value={fovCenterRa}
+              onChange={(e) => setFCR(e.target.value)}
             />
           </div>
           <div className="mb-3">
@@ -93,8 +94,8 @@ function App() {
               type="text"
               className="form-control"
               name="fov_center_dec"
-              value={formData.fov_center_dec}
-              onChange={handleChange}
+              value={fovCenterDec}
+              onChange={(e) => setFCD(e.target.value)}
             />
           </div>
           <button type="submit" className="btn btn-primary">

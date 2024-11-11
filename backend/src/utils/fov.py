@@ -30,7 +30,6 @@ def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor
 
     print("input: ", fov_center_lat, fov_center_lon, radius)
 
-    #flight_info = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
-    flight_info = fa.find_flights_in_circ_boundary(43, -79, 50000)
+    flight_info = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
 
     return flight_info
