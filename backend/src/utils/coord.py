@@ -1,20 +1,92 @@
 from astropy.time import Time
 from astropy import units as u
 from astropy.coordinates import EarthLocation, ITRS, AltAz, SkyCoord, Longitude, Latitude
+from dataclasses import dataclass
 import sys
 
 
-def convert_ra_dec_to_lat_lon(*, ra, dec, time=Time.now()):
-    sky_obj_icrs = SkyCoord(ra = ra * u.deg, dec = dec * u.deg, frame="icrs")
+"""
+Dataclass to represent angles in hours, minutes and seconds (HMS) format
+"""
+@dataclass
+class HMS:
+    hours: int
+    minutes:int
+    seconds:float
+    
+    """
+    Validate the hours, minutes, and seconds upon initialization.
+    """
+    def __post_init__(self):
+        if not (0 <= self.hours < 24):
+            raise ValueError("Hours must be in the range 0-23.")
+        if not (0 <= self.minutes < 60):
+            raise ValueError("Minutes must be in the range 0-59.")
+        if not (0 <= self.seconds < 60):
+            raise ValueError("Seconds must be in the range 0-59.")
 
-    observation_time = Time.now() #UTC time
+    """
+    Convert the HMS angle to degrees.
+    
+    Returns:
+        float: The angle in degrees.
+    """
+    def to_degrees(self):
+        # Convert to degrees
+        deg = (self.hours + self.minutes / 60 + self.seconds / 3600) * 15  # 1 hour = 15 degrees
+        print(deg)
+        return deg
 
-    gst = observation_time.sidereal_time('mean', 'greenwich')
+"""
+Convert Right Ascension (RA) and Declination (DEC) to Latitude and Longitude.
 
-    lon = Longitude(ra * u.deg - gst)
+Parameters:
+    ra: Right Ascension in degrees or HMS format. If `ra_format` is "hms",
+        provide RA as a tuple or list (hours, minutes, seconds).
+    dec: Declination in degrees.
+    time: Observation time as an astropy Time object. Defaults to the current UTC time.
+    ra_format: The format of RA. Either "deg" for degrees or "hms" for hours-minutes-seconds.
+
+Returns:
+    A tuple (lat, lon) where:
+    - lat is the latitude (corresponding to declination) as an astropy Latitude object.
+    - lon is the longitude (corresponding to RA adjusted for sidereal time) as an astropy Longitude object.
+"""
+def convert_ra_dec_to_lat_lon(*, ra, dec, time=None, ra_format="deg"):
+    
+    if time == None:
+        time = Time.now()
+    elif isinstance(time, str):
+        try:
+            time = Time(time)
+        except ValueError as e:
+            raise ValueError(f"Invalid time format: {e}")
+
+    if ra_format == "hms":
+        if isinstance(ra, HMS):
+            ra_deg = ra.to_degrees()
+        elif isinstance(ra, (tuple, list)) and len(ra) == 3:
+            try:
+                ra_deg = HMS(*ra).to_degrees()
+            except ValueError as e:
+                raise ValueError("Invalid RA in HMS format: {e}")
+        else:
+            raise ValueError("For 'hms' format, RA must be an HMS object, tuple or list (hours, minutes, seconds).")
+    elif ra_format == "deg":
+        if isinstance(ra, (float, int)):
+            ra_deg = ra
+    else:
+        raise ValueError("Invalid 'ra_format'. Use 'deg' or 'hms'.")
+
+    sky_obj_icrs = SkyCoord(ra=ra_deg * u.deg, dec=dec * u.deg, frame="icrs")
+
+    gst_deg = time.sidereal_time('mean', 'greenwich')
+
+    lon = Longitude(sky_obj_icrs.ra - gst_deg)
     lon.wrap_angle = 180 * u.deg
 
     lat = Latitude(dec * u.deg)
+
 
     return (lat, lon)
 
@@ -57,18 +129,9 @@ def convert_lat_lon_to_ra_dec(
 
 
 if __name__ == "__main__":
-    observation_time = Time.now() #UTC time
 
-    sky_obj_icrs = SkyCoord(ra =10 * u.deg, dec = 20 * u.deg, frame="icrs")
+    print(convert_ra_dec_to_lat_lon(ra=(1,1,30), dec = 50, ra_format="hms"))
 
-    gst = observation_time.sidereal_time('mean', 'greenwich')
-    print(gst.to(u.degree))
-
-    long = Longitude(10 * u.deg - gst)
-    long.wrap_angle = 180*u.deg
-    print (long.degree)
-
-    print(convert_ra_dec_to_lat_lon(ra = 10, dec = 20))
     sys.exit(0)
 
     # Define observer's location
