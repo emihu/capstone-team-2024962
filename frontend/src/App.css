@@ -1,3 +1,15 @@
 .container {
   margin: 30px;
 }
+
+.input-field {
+  padding-top: 15px;
+}
+
+.btn {
+  margin-top: 20px;
+}
+
+.table {
+  margin-top: 15px;
+}
