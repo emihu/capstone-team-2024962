@@ -102,7 +102,11 @@ function App() {
             Submit
           </button>
         </form>
-        <p>{JSON.stringify(data, null, 2)}</p>
+        {data === "" ? null : data.length === 0 ? (
+          <p>No flights found</p>
+        ) : (
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        )}
       </div>
     </>
   );
