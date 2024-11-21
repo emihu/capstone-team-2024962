@@ -203,11 +203,11 @@ function App() {
                 <thead className="thead-dark">
                   <tr>
                     <th>Flight Number</th>
-                    <th>Altitude</th>
-                    <th>Heading</th>
+                    <th>Altitude (feet)</th>
+                    <th>Heading (degrees)</th>
                     <th>Latitude</th>
                     <th>Longitude</th>
-                    <th>Speed</th>
+                    <th>Speed (knots)</th>
                   </tr>
                 </thead>
                 <tbody>
