@@ -18,6 +18,7 @@ def get_flight_info(flights):
             "speed": flight.ground_speed,
             "heading": flight.heading
         })
+
     return flight_info
 
 
