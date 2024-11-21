@@ -194,7 +194,7 @@ function App() {
             Submit
           </button>
         </form>
-        {data.length === 0 ? null : data.length === 0 ? (
+        {data.length === 0 ? (
           <p>No flights found</p>
         ) : (
           <div>
