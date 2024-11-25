@@ -12,6 +12,11 @@ import MapFlights from "./components/MapFlights";
 
 function App() {
   const [data, setData] = useState<any[]>([]);
+  const [fovBorder, setFovBorder] = useState({
+    lat: 0,
+    lon: 0,
+    radius: 0,
+  });
   const [focalLength, setFL] = useState("");
   const [cameraSensorSize, setCSS] = useState("");
   const [barlowReducerFactor, setBRF] = useState("");
@@ -38,9 +43,11 @@ function App() {
       axios
         .post(`http://127.0.0.1:5000/api/flight-prediction`, formData)
         .then((response) => {
-          const responseData = response.data;
-          console.log(responseData);
-          setData(responseData);
+          const { flight_info, fov_border } = response.data;
+          console.log(flight_info);
+          console.log(fov_border);
+          setData(flight_info);
+          setFovBorder(fov_border);
         })
         .catch((error) => {
           console.error("There was an error", error);
@@ -186,7 +193,7 @@ function App() {
               />
             </div>
             <div className="col-auto">
-              <span className="form-text">&deg;</span>
+              <span className="form-text">deg</span>
             </div>
           </div>
 
@@ -204,9 +211,9 @@ function App() {
                   <tr>
                     <th>Flight Number</th>
                     <th>Altitude (feet)</th>
-                    <th>Heading (degrees)</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
+                    <th>Heading (deg)</th>
+                    <th>Latitude (deg)</th>
+                    <th>Longitude (deg)</th>
                     <th>Speed (knots)</th>
                   </tr>
                 </thead>
@@ -224,7 +231,7 @@ function App() {
                 </tbody>
               </table>
             </div>
-            <MapFlights data={data} />
+            <MapFlights data={data} fovBorder={fovBorder} />
           </div>
         )}
       </div>

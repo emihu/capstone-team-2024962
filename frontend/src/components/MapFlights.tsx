@@ -1,7 +1,12 @@
 import React, { useEffect } from "react";
 import L from "leaflet";
 
-function MapFlights({ data }: { data: any[] }) {
+interface MapFlightsProps {
+  data: any[];
+  fovBorder: { lat: number; lon: number; radius: number };
+}
+
+function MapFlights({ data, fovBorder }: MapFlightsProps) {
   useEffect(() => {
     // Initialize the map
     const map = L.map("map").setView([data[0].latitude, data[0].longitude], 6); // Default center and zoom
@@ -20,6 +25,15 @@ function MapFlights({ data }: { data: any[] }) {
           `<strong>Flight Number:</strong> ${flight.flight_number}<br><strong>Altitude:</strong> ${flight.altitude} ft<br><strong>Speed:</strong> ${flight.speed} knots`
         );
     });
+
+    // Add non-filled circle around the flight's coordinates
+    const radiusInMeters = Math.abs(fovBorder.radius);
+    L.circle([fovBorder.lat, fovBorder.lon], {
+      color: "blue", // Border color
+      fillColor: "transparent", // No fill
+      fillOpacity: 0, // Ensure no fill
+      radius: radiusInMeters, // Radius in meters
+    }).addTo(map);
 
     return () => {
       map.remove();
