@@ -13,10 +13,10 @@ def get_flight_info(flights):
         flight_info.append({
             "flight_number": flight.number,
             "latitude": flight.latitude,
-            "longitude": flight.longitude,
-            "altitude": flight.altitude,
-            "speed": flight.ground_speed,
-            "heading": flight.heading
+            "longitude": flight.longitude, 
+            "altitude": flight.altitude, # in feet
+            "speed": flight.ground_speed, # in knots
+            "heading": flight.heading # 0 is north, 90 is east, 180 is south, 270 is west
         })
 
     return flight_info

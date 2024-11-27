@@ -42,8 +42,17 @@ function App() {
         fovCenterRaM,
         fovCenterRaS,
         fovCenterDec,
+        flightDataType,
+        simulatedFlights
       };
+
+      if (simulatedFlights.length === 0 && flightDataType === "simulated") {
+        alert("Error: please add at least one simulated flight when using simulated flight data.");
+        return;
+      }
+    
       console.log(formData);
+      // Send POST request to backend
       axios
         .post(`http://127.0.0.1:5000/api/flight-prediction`, formData)
         .then((response) => {
@@ -68,10 +77,22 @@ function App() {
       return;
     }
   
+    const altitudeValue = parseFloat(altitude);
+    const speedValue = parseFloat(speed);
     const latitudeValue = parseFloat(latitude);
     const longitudeValue = parseFloat(longitude);
     const headingValue = parseFloat(heading);
   
+    if (altitudeValue < 0) {
+      alert("Error: simulated flight not added. Altitude must be a positive number.");
+      return;
+    }
+
+    if (speedValue < 0) {
+      alert("Error: simulated flight not added. Speed must be a positive number.");
+      return;
+    }
+
     if (latitudeValue < -90 || latitudeValue > 90) {
       alert("Error: simulated flight not added. Latitude must be between -90 and 90 degrees.");
       return;
