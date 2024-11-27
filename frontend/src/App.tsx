@@ -60,6 +60,33 @@ function App() {
   };
 
   const addSimulatedFlight = () => {
+    const { altitude, speed, latitude, longitude, heading } = newFlight;
+
+    // Error checking
+    if (!altitude || !speed || !latitude || !longitude || !heading) {
+      alert("Error: simulated flight not added. All fields must be filled out.");
+      return;
+    }
+  
+    const latitudeValue = parseFloat(latitude);
+    const longitudeValue = parseFloat(longitude);
+    const headingValue = parseFloat(heading);
+  
+    if (latitudeValue < -90 || latitudeValue > 90) {
+      alert("Error: simulated flight not added. Latitude must be between -90 and 90 degrees.");
+      return;
+    }
+  
+    if (longitudeValue < -180 || longitudeValue > 180) {
+      alert("Error: simulated flight not added. Longitude must be between -180 and 180 degrees.");
+      return;
+    }
+  
+    if (headingValue < 0 || headingValue >= 360) {
+      alert("Error: simulated flight not added. Heading must be between 0 and 360 degrees.");
+      return;
+    }
+
     setSimulatedFlights([...simulatedFlights, { ...newFlight }]);
     setNewFlight({ altitude: "", speed: "", latitude: "", longitude: "", heading: "" });
   };
@@ -295,7 +322,7 @@ function App() {
                   />
                 </div>
                 <div className="col-auto">
-                  <span className="form-text">&deg;</span>
+                  <span className="form-text">deg</span>
                 </div>
               </div>
 
@@ -312,7 +339,7 @@ function App() {
                   />
                 </div>
                 <div className="col-auto">
-                  <span className="form-text">&deg;</span>
+                  <span className="form-text">deg</span>
                 </div>
               </div>
 
@@ -329,7 +356,7 @@ function App() {
                   />
                 </div>
                 <div className="col-auto">
-                  <span className="form-text">&deg;</span>
+                  <span className="form-text">deg</span>
                 </div>
               </div>
 
@@ -344,9 +371,9 @@ function App() {
                     <tr>
                       <th>Flight Number</th>
                       <th>Altitude (feet)</th>
-                      <th>Heading (degrees)</th>
-                      <th>Latitude</th>
-                      <th>Longitude</th>
+                      <th>Heading (deg)</th>
+                      <th>Latitude (deg)</th>
+                      <th>Longitude (deg)</th>
                       <th>Speed (knots)</th>
                       <th>Actions</th>
                     </tr>
@@ -392,9 +419,9 @@ function App() {
                   <tr>
                     <th>Flight Number</th>
                     <th>Altitude (feet)</th>
-                    <th>Heading (degrees)</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
+                    <th>Heading (deg)</th>
+                    <th>Latitude (deg)</th>
+                    <th>Longitude (deg)</th>
                     <th>Speed (knots)</th>
                   </tr>
                 </thead>
