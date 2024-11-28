@@ -41,7 +41,7 @@ def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simula
     for flight in simulated_flights:
         flight_lat = flight['latitude']
         flight_lon = flight['longitude']
-        distance = haversine(fov_center_lat, fov_center_lon, flight_lat, flight_lon)
+        distance = haversine(float(fov_center_lat), float(fov_center_lon), float(flight_lat), float(flight_lon))
         
         # If the distance is less than or equal to the radius, the flight is in the circular FOV
         if distance <= radius:

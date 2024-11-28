@@ -25,6 +25,29 @@ function FlightPredictor() {
   const [fovCenterRaM, setFCRM] = useState("");
   const [fovCenterRaS, setFCRS] = useState("");
   const [fovCenterDec, setFCD] = useState("");
+  const [flightDataType, setFlightDataType] = useState("live"); // 'live' or 'simulated'
+  const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]); // Manage simulated flights
+  const [newFlight, setNewFlight] = useState({
+    altitude: "",
+    speed: "",
+    latitude: "",
+    longitude: "",
+    heading: "",
+  });
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isUpdating) {
+      interval = setInterval(() => {
+        fetchFlightData();
+      }, 10000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isUpdating]);
 
   const fetchFlightData = async () => {
     try {
@@ -45,7 +68,16 @@ function FlightPredictor() {
         fovCenterRaM,
         fovCenterRaS,
         fovCenterDec,
+        flightDataType,
+        simulatedFlights,
       };
+
+      if (simulatedFlights.length === 0 && flightDataType === "simulated") {
+        alert(
+          "Error: please add at least one simulated flight when using simulated flight data."
+        );
+        return;
+      }
       console.log("Fetching flight data...", formData);
       axios
         .post(`http://127.0.0.1:5000/api/flight-prediction`, formData)
@@ -88,19 +120,76 @@ function FlightPredictor() {
     setIsUpdating(true); // Start periodic updates
   };
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+  const addSimulatedFlight = () => {
+    const { altitude, speed, latitude, longitude, heading } = newFlight;
 
-    if (isUpdating) {
-      interval = setInterval(() => {
-        fetchFlightData();
-      }, 10000);
+    // Error checking
+    if (!altitude || !speed || !latitude || !longitude || !heading) {
+      alert(
+        "Error: simulated flight not added. All fields must be filled out."
+      );
+      return;
     }
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isUpdating]);
+    const altitudeValue = parseFloat(altitude);
+    const speedValue = parseFloat(speed);
+    const latitudeValue = parseFloat(latitude);
+    const longitudeValue = parseFloat(longitude);
+    const headingValue = parseFloat(heading);
+
+    if (altitudeValue < 0) {
+      alert(
+        "Error: simulated flight not added. Altitude must be a positive number."
+      );
+      return;
+    }
+
+    if (speedValue < 0) {
+      alert(
+        "Error: simulated flight not added. Speed must be a positive number."
+      );
+      return;
+    }
+
+    if (latitudeValue < -90 || latitudeValue > 90) {
+      alert(
+        "Error: simulated flight not added. Latitude must be between -90 and 90 degrees."
+      );
+      return;
+    }
+
+    if (longitudeValue < -180 || longitudeValue > 180) {
+      alert(
+        "Error: simulated flight not added. Longitude must be between -180 and 180 degrees."
+      );
+      return;
+    }
+
+    if (headingValue < 0 || headingValue >= 360) {
+      alert(
+        "Error: simulated flight not added. Heading must be between 0 and 360 degrees."
+      );
+      return;
+    }
+
+    setSimulatedFlights([...simulatedFlights, { ...newFlight }]);
+    setNewFlight({
+      altitude: "",
+      speed: "",
+      latitude: "",
+      longitude: "",
+      heading: "",
+    });
+  };
+
+  const removeSimulatedFlight = (index: number) => {
+    const updatedFlights = simulatedFlights.filter((_, i) => i !== index);
+    setSimulatedFlights(updatedFlights);
+  };
+
+  const handleFlightInputChange = (field: string, value: string) => {
+    setNewFlight({ ...newFlight, [field]: value });
+  };
 
   return (
     <>
@@ -238,6 +327,183 @@ function FlightPredictor() {
               <span className="form-text">deg</span>
             </div>
           </div>
+          <div className="mb-3 input-field">
+            <label className="form-label">Select Flight Data Source</label>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                id="liveData"
+                name="dataType"
+                value="live"
+                checked={flightDataType === "live"}
+                onChange={(e) => setFlightDataType(e.target.value)}
+              />
+              <label className="form-check-label" htmlFor="liveData">
+                Live Data
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                id="simulatedData"
+                name="dataType"
+                value="simulated"
+                checked={flightDataType === "simulated"}
+                onChange={(e) => setFlightDataType(e.target.value)}
+              />
+              <label className="form-check-label" htmlFor="simulatedData">
+                Simulated Data
+              </label>
+            </div>
+          </div>
+
+          {flightDataType === "simulated" && (
+            <div>
+              <h3>Add Simulated Flight</h3>
+              <div className="row g-3 align-items-center mb-3">
+                <div className="col-sm-2">
+                  <label className="form-label">Altitude</label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={newFlight.altitude}
+                    onChange={(e) =>
+                      handleFlightInputChange("altitude", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-auto">
+                  <span className="form-text">feet</span>
+                </div>
+              </div>
+
+              <div className="row g-3 align-items-center mb-3">
+                <div className="col-sm-2">
+                  <label className="form-label">Speed</label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={newFlight.speed}
+                    onChange={(e) =>
+                      handleFlightInputChange("speed", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-auto">
+                  <span className="form-text">knots</span>
+                </div>
+              </div>
+
+              <div className="row g-3 align-items-center mb-3">
+                <div className="col-sm-2">
+                  <label className="form-label">Latitude</label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={newFlight.latitude}
+                    onChange={(e) =>
+                      handleFlightInputChange("latitude", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-auto">
+                  <span className="form-text">deg</span>
+                </div>
+              </div>
+
+              <div className="row g-3 align-items-center mb-3">
+                <div className="col-sm-2">
+                  <label className="form-label">Longitude</label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={newFlight.longitude}
+                    onChange={(e) =>
+                      handleFlightInputChange("longitude", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-auto">
+                  <span className="form-text">deg</span>
+                </div>
+              </div>
+
+              <div className="row g-3 align-items-center mb-3">
+                <div className="col-sm-2">
+                  <label className="form-label">Heading</label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={newFlight.heading}
+                    onChange={(e) =>
+                      handleFlightInputChange("heading", e.target.value)
+                    }
+                  />
+                </div>
+                <div className="col-auto">
+                  <span className="form-text">deg</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-secondary mb-3"
+                onClick={addSimulatedFlight}
+              >
+                Add Flight
+              </button>
+
+              <h3>Simulated Flights</h3>
+              <div className="table-responsive">
+                <table className="table table-striped table-bordered table-light">
+                  <thead className="thead-dark">
+                    <tr>
+                      <th>Flight Number</th>
+                      <th>Altitude (feet)</th>
+                      <th>Heading (deg)</th>
+                      <th>Latitude (deg)</th>
+                      <th>Longitude (deg)</th>
+                      <th>Speed (knots)</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {simulatedFlights.map((flight: any, index: number) => (
+                      <tr key={index}>
+                        <td>{`SIM${index + 1}`}</td>
+                        <td>{flight.altitude}</td>
+                        <td>{flight.heading}</td>
+                        <td>{flight.latitude}</td>
+                        <td>{flight.longitude}</td>
+                        <td>{flight.speed}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="btn btn-danger btn-sm"
+                            onClick={() => removeSimulatedFlight(index)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           <button type="submit" className="btn btn-primary">
             Submit
