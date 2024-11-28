@@ -33,3 +33,6 @@ def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor
     flight_info = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
 
     return flight_info
+
+def get_api_query_search_radius(fov_radius, max_plane_speed: float, exposure_time: float | int) -> float:
+    return fov_radius + max_plane_speed * float(exposure_time/3600.0)
