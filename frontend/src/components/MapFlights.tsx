@@ -32,7 +32,7 @@ function MapFlights({ data, fovBorder }: MapFlightsProps) {
       color: "blue", // Border color
       fillColor: "transparent", // No fill
       fillOpacity: 0, // Ensure no fill
-      radius: radiusInMeters, // Radius in meters
+      radius: radiusInMeters * 1.1, // Radius in meters
     }).addTo(map);
 
     return () => {
