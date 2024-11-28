@@ -21,9 +21,11 @@ def flightPrediction():
     fov_center_ra_m = float(data.get('fovCenterRaM'))
     fov_center_ra_s = float(data.get('fovCenterRaS'))
     fov_center_dec = float(data.get('fovCenterDec'))
+    flight_data_type = data.get('flightDataType')
+    simulated_flights = data.get('simulatedFlights')
     
     result = check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor, fov_center_ra_h, \
-                                  fov_center_ra_m, fov_center_ra_s, fov_center_dec)
+                                  fov_center_ra_m, fov_center_ra_s, fov_center_dec, flight_data_type, simulated_flights)
     return jsonify(result), 200
 
 if __name__ == "__main__":

@@ -13,10 +13,10 @@ def get_flight_info(flights):
         flight_info.append({
             "flight_number": flight.number,
             "latitude": flight.latitude,
-            "longitude": flight.longitude,
-            "altitude": flight.altitude,
-            "speed": flight.ground_speed,
-            "heading": flight.heading
+            "longitude": flight.longitude, 
+            "altitude": flight.altitude, # in feet
+            "speed": flight.ground_speed, # in knots
+            "heading": flight.heading # 0 is north, 90 is east, 180 is south, 270 is west
         })
 
     return flight_info
@@ -45,4 +45,4 @@ if __name__ == "__main__":
     print(find_flights_in_rect_boundary(-79.42, 43.7, -79.41, 43.71))
 
     # Find all flights within a circular boundary
-    print(find_flights_in_circ_boundary(43.7, -79.42, 100000)) # 1000 meters = 1 km
+    print(find_flights_in_circ_boundary(43.7, -79.42, 10000)) # 1000 meters = 1 km
