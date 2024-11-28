@@ -9,7 +9,7 @@ interface MapFlightsProps {
 function MapFlights({ data, fovBorder }: MapFlightsProps) {
   useEffect(() => {
     // Initialize the map
-    const map = L.map("map").setView([data[0].latitude, data[0].longitude], 6); // Default center and zoom
+    const map = L.map("map").setView([data[0].latitude, data[0].longitude], 7); // Default center and zoom
 
     // Add a tile layer
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -32,7 +32,7 @@ function MapFlights({ data, fovBorder }: MapFlightsProps) {
       color: "blue", // Border color
       fillColor: "transparent", // No fill
       fillOpacity: 0, // Ensure no fill
-      radius: radiusInMeters * 1.1, // Radius in meters
+      radius: radiusInMeters * 1.3, // Radius in meters
     }).addTo(map);
 
     return () => {

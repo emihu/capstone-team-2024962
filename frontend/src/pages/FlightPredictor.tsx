@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./FlightPredictor.css";
 import axios from "axios";
 
@@ -11,6 +11,7 @@ import MapFlights from "../components/MapFlights";
 
 function FlightPredictor() {
   const [data, setData] = useState<any[]>([]);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [fovBorder, setFovBorder] = useState({
     lat: 0,
     lon: 0,
@@ -25,9 +26,16 @@ function FlightPredictor() {
   const [fovCenterRaS, setFCRS] = useState("");
   const [fovCenterDec, setFCD] = useState("");
 
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
+  const fetchFlightData = async () => {
     try {
+      setFL(focalLength);
+      setCSS(cameraSensorSize);
+      setBRF(barlowReducerFactor);
+      setE(exposure);
+      setFCRH(fovCenterRaH);
+      setFCRM(fovCenterRaM);
+      setFCRS(fovCenterRaS);
+      setFCD(fovCenterDec);
       const formData = {
         focalLength,
         cameraSensorSize,
@@ -38,7 +46,7 @@ function FlightPredictor() {
         fovCenterRaS,
         fovCenterDec,
       };
-      console.log(formData);
+      console.log("Fetching flight data...", formData);
       axios
         .post(`http://127.0.0.1:5000/api/flight-prediction`, formData)
         .then((response) => {
@@ -52,9 +60,47 @@ function FlightPredictor() {
           console.error("There was an error", error);
         });
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error fetching flight data:", error);
     }
   };
+
+  //   const handleSubmit = (event: any) => {
+  //     event.preventDefault();
+  //     fetchFlightData();
+  //     setIsUpdating(true); // Start periodic updates after submission
+  //   };
+  const handleSubmit = (event: any) => {
+    setIsUpdating(false);
+    event.preventDefault();
+
+    // Update state variables explicitly (if needed)
+    setFL(focalLength); // Ensures the most current value is set
+    setCSS(cameraSensorSize);
+    setBRF(barlowReducerFactor);
+    setE(exposure);
+    setFCRH(fovCenterRaH);
+    setFCRM(fovCenterRaM);
+    setFCRS(fovCenterRaS);
+    setFCD(fovCenterDec);
+
+    // Call API with the current state values
+    fetchFlightData();
+    setIsUpdating(true); // Start periodic updates
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isUpdating) {
+      interval = setInterval(() => {
+        fetchFlightData();
+      }, 10000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isUpdating]);
 
   return (
     <>
