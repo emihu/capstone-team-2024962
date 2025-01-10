@@ -114,18 +114,37 @@ def convert_lat_lon_to_ra_dec(
         lat=sky_obj_lat * u.deg, lon=sky_obj_lon * u.deg, height=sky_obj_alt * u.m
     )
 
-    sky_obj_itrs = sky_object_location.get_itrs(obstime=observer_time)
+    # https://docs.astropy.org/en/stable/coordinates/common_errors.html
+    sky_obj_itrs = sky_object_location.get_itrs(obstime=observer_time, location=observer_location)
 
     # Convert vector to AltAz frame
     altaz_frame = AltAz(obstime=observer_time, location=observer_location)
+
+    print(f"altaz frame location: {altaz_frame.location}, time: {altaz_frame.obstime}")
     sky_obj_altaz = sky_obj_itrs.transform_to(altaz_frame)
     
-    print(sky_obj_altaz)
+    print(f"az, alt - {sky_obj_altaz.az} , {sky_obj_altaz.alt}")
 
-    # Convert AltAz to ICRS (equatorial coordinates)
-    sky_obj_icrs = sky_obj_altaz.transform_to(ICRS())
+    sky_obj_alt = sky_obj_altaz.alt.rad
+    sky_obj_az = sky_obj_altaz.az.rad
+    sky_obj_lat_rad = sky_obj_lat * np.pi / 180
 
-    return (sky_obj_icrs.ra, sky_obj_icrs.dec)
+    declination = np.arcsin(np.sin(sky_obj_alt) * np.sin(sky_obj_lat_rad) + 
+        np.cos(sky_obj_alt) * np.cos(sky_obj_az) * np.cos(sky_obj_lat_rad))
+
+
+    hour_angle = np.arccos((np.sin(sky_obj_alt) - np.sin(sky_obj_lat_rad) * np.sin(declination))/
+                           (np.cos(sky_obj_lat_rad) * np.cos(declination))) * 180 / np.pi
+
+
+    if not np.sin(hour_angle) < 0:
+        hour_angle = 360 - hour_angle
+
+    lst = observer_time.sidereal_time('mean', longitude=sky_obj_lon)
+
+    right_ascention = lst - hour_angle * u.deg
+
+    return (right_ascention, declination * 180 / np.pi)
 
 
 def get_distance_from_lat_lon_pair(first_latlon, second_latlon, radius):
@@ -176,13 +195,11 @@ def get_distance_from_lat_lon_pair(first_latlon, second_latlon, radius):
 
 if __name__ == "__main__":
 
-    print(convert_ra_dec_to_lat_lon(ra=(1,1,30), dec = 50, ra_format="hms"))
 
-    result = convert_lat_lon_to_ra_dec(sky_obj_lat=43.68717, sky_obj_lon=-79.62347, sky_obj_alt=10000, obs_lat=43.68717, obs_lon=-79.62347, obs_alt=0)
+    result = convert_lat_lon_to_ra_dec(sky_obj_lat=43.6798, sky_obj_lon=-79.6284, sky_obj_alt=10000, obs_lat=43.6798, obs_lon=-79.6284, obs_alt=0)
 
     print(result)
 
-
-    print(convert_ra_dec_to_lat_lon(ra=result[0].deg, dec=result[1].deg))
+    print(convert_ra_dec_to_lat_lon(ra=result[0].deg, dec=result[1]))
 
     sys.exit(0)
