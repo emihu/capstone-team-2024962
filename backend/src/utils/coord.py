@@ -1,7 +1,8 @@
 from astropy.time import Time
 from astropy import units as u
-from astropy.coordinates import EarthLocation, ITRS, AltAz, SkyCoord, Longitude, Latitude
+from astropy.coordinates import EarthLocation, ICRS, AltAz, SkyCoord, Longitude, Latitude
 from dataclasses import dataclass
+import numpy as np
 import sys
 
 
@@ -113,57 +114,92 @@ def convert_lat_lon_to_ra_dec(
         lat=sky_obj_lat * u.deg, lon=sky_obj_lon * u.deg, height=sky_obj_alt * u.m
     )
 
-    observer_itrs = observer_location.get_itrs(obstime=observer_time)
-    sky_obj_itrs = sky_object_location.get_itrs(obstime=observer_time)
-
-    vector_observer_to_object = sky_obj_itrs.cartesian - observer_itrs.cartesian
+    # https://docs.astropy.org/en/stable/coordinates/common_errors.html
+    sky_obj_itrs = sky_object_location.get_itrs(obstime=observer_time, location=observer_location)
 
     # Convert vector to AltAz frame
     altaz_frame = AltAz(obstime=observer_time, location=observer_location)
-    sky_obj_altaz = SkyCoord(vector_observer_to_object, frame=altaz_frame)
 
-    # Convert AltAz to ICRS (equatorial coordinates)
-    sky_obj_icrs = sky_obj_altaz.transform_to("icrs")
+    print(f"altaz frame location: {altaz_frame.location}, time: {altaz_frame.obstime}")
+    sky_obj_altaz = sky_obj_itrs.transform_to(altaz_frame)
+    
+    print(f"az, alt - {sky_obj_altaz.az} , {sky_obj_altaz.alt}")
 
-    return (sky_obj_icrs.ra, sky_obj_icrs.dec)
+    sky_obj_alt = sky_obj_altaz.alt.rad
+    sky_obj_az = sky_obj_altaz.az.rad
+    sky_obj_lat_rad = sky_obj_lat * np.pi / 180
+
+    declination = np.arcsin(np.sin(sky_obj_alt) * np.sin(sky_obj_lat_rad) + 
+        np.cos(sky_obj_alt) * np.cos(sky_obj_az) * np.cos(sky_obj_lat_rad))
+
+
+    hour_angle = np.arccos((np.sin(sky_obj_alt) - np.sin(sky_obj_lat_rad) * np.sin(declination))/
+                           (np.cos(sky_obj_lat_rad) * np.cos(declination))) * 180 / np.pi
+
+
+    if not np.sin(hour_angle) < 0:
+        hour_angle = 360 - hour_angle
+
+    lst = observer_time.sidereal_time('mean', longitude=sky_obj_lon)
+
+    right_ascention = lst - hour_angle * u.deg
+
+    return (right_ascention, declination * 180 / np.pi)
+
+
+def get_distance_from_lat_lon_pair(first_latlon, second_latlon, radius):
+    """
+    Calculates the great-circle distance between two points on a sphere given their latitude and longitude.
+
+    Parameters:
+    - first_latlon (tuple of float): A tuple `(lat1, lon1)` representing the latitude and longitude of the first point in decimal degrees.
+    - second_latlon (tuple of float): A tuple `(lat2, lon2)` representing the latitude and longitude of the second point in decimal degrees.
+    - radius (float): The radius of the sphere in kilometers.
+      - For Earth, this is typically the Earth's radius plus the altitude of the flights, as aircraft fly above the Earth's surface.
+
+    Returns:
+    - distance (float): The distance between the two points along the surface of the sphere in kilometers.
+
+    Notes:
+    - The function uses the Haversine formula to calculate the great-circle distance between two points on the sphere.
+    - The Earth's mean radius is approximately 6,371 km. When calculating distances involving aircraft, you may add the cruising altitude (e.g., 10 km) to the Earth's radius to get a more accurate result.
+    - Ensure that the latitude values are within the range [-90, 90] and longitude values are within the range [-180, 180].
+
+    Example:
+    ```python
+    # Coordinates of two points (latitude and longitude in degrees)
+    point_a = (51.5074, -0.1278)  # London
+    point_b = (40.7128, -74.0060)  # New York City
+
+    # Earth's radius plus average cruising altitude of a flight (~10 km)
+    earth_radius_km = 6371.0 + 10.0
+
+    distance = get_distance_from_lat_lon_pair(point_a, point_b, earth_radius_km)
+    print(f"The distance between London and New York City is approximately {distance:.2f} km.")
+    ```
+    """
+
+    lat1, lon1 = first_latlon
+    lat2, lon2 = second_latlon
+
+
+    delta_lat = np.radians(lat2) - np.radians(lat1)
+    delta_lon = np.radians(lon2) - np.radians(lon1)
+
+    # https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
+    a = np.sin(delta_lat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(delta_lon/2)**2
+    c = 2 * np.asin(np.sqrt(a)) 
+    return radius * c
+
 
 
 if __name__ == "__main__":
 
-    print(convert_ra_dec_to_lat_lon(ra=(1,1,30), dec = 50, ra_format="hms"))
+
+    result = convert_lat_lon_to_ra_dec(sky_obj_lat=43.6798, sky_obj_lon=-79.6284, sky_obj_alt=10000, obs_lat=43.6798, obs_lon=-79.6284, obs_alt=0)
+
+    print(result)
+
+    print(convert_ra_dec_to_lat_lon(ra=result[0].deg, dec=result[1]))
 
     sys.exit(0)
-
-    # Define observer's location
-    observer_location = EarthLocation(
-        lat=45.5017, lon=-73.5673, height=10
-    )  # Montreal, QC
-
-    # Define aircraft's location
-    aircraft_location = EarthLocation(
-        lat=46.0, lon=-74.0, height=10000
-    )  # Example coordinates
-
-    # Define observation time
-    observation_time = Time("2024-10-31 18:00:00")  # UTC
-
-    # Convert to ITRS coordinates
-    observer_itrs = observer_location.get_itrs(obstime=observation_time)
-    aircraft_itrs = aircraft_location.get_itrs(obstime=observation_time)
-
-    vector_observer_to_aircraft = aircraft_itrs.cartesian - observer_itrs.cartesian
-
-    print(vector_observer_to_aircraft)
-
-    # Convert vector to AltAz frame
-    altaz_frame = AltAz(obstime=observation_time, location=observer_location)
-    aircraft_altaz = SkyCoord(vector_observer_to_aircraft, frame=altaz_frame)
-
-    # Convert AltAz to ICRS (equatorial coordinates)
-    aircraft_icrs = aircraft_altaz.transform_to("icrs")
-
-    # Output Right Ascension and Declination
-    ra = aircraft_icrs.ra
-    dec = aircraft_icrs.dec
-
-    print((ra, dec))
