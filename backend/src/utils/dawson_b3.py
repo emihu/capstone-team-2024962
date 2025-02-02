@@ -81,7 +81,7 @@ def theta_current_position(speed, radius, height, bearing, time_shift, original_
     ret = theta_angular_speed(speed, radius, height, bearing, time_shift, original_latitude) * time_shift + deg_to_rad(normalize_longitude(original_longitude))
     ret = ret % (2 * math.pi)
     if (phi_signed_current_position(speed, radius, height, bearing, time_shift, original_latitude) < 0):
-        return ret + math.pi
+        return (ret + math.pi) % (2 * math.pi)
     return ret
 
 
