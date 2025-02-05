@@ -33,9 +33,10 @@ def get_local_sidereal_time(lat, lon, time = None):
     observing_location = EarthLocation(lat=myLat*u.deg, lon=myLon*u.deg)
     observing_time = Time(time, scale='utc', location=observing_location)
     LST = observing_time.sidereal_time('mean')
-    return LST * u.deg
+    return LST.rad
 
 if __name__ == "__main__":
+    print("local sidereal time")
     print(get_local_sidereal_time(myLat, myLon))
     print(coord.convert_lat_lon_to_ra_dec(sky_obj_lat=myLat, sky_obj_lon=myLon, sky_obj_alt=0, obs_lat=myLat, obs_lon=myLon, obs_alt=0, observer_time=Time.now()))
     ra, dec = coord.convert_lat_lon_to_ra_dec(sky_obj_lat=myLat, sky_obj_lon=myLon, sky_obj_alt=0, obs_lat=myLat, obs_lon=myLon, obs_alt=0, observer_time=Time.now()) 

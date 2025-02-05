@@ -76,6 +76,8 @@ def convert_ra_dec_to_lat_lon(*, ra, dec, time=None, ra_format="deg"):
     elif ra_format == "deg":
         if isinstance(ra, (float, int)):
             ra_deg = ra
+        else:
+            raise(ValueError("For 'deg' format, RA must be a float or int."))
     else:
         raise ValueError("Invalid 'ra_format'. Use 'deg' or 'hms'.")
 
