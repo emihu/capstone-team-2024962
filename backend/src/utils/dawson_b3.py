@@ -29,15 +29,15 @@ def theta_to_lon(theta) -> float:
 
 def normalize_longitude(lon) -> float:
     """
-    Normalize the longitude to be in the range [-180, 180].
+    Normalize the longitude to be in the range of [0, 360).
     """
-    return (lon + 180) % 360 - 180
+    return (lon + 360) % 360
 
 def unconvert_longitude(lon) -> float:
     """
-    Unconvert the longitude to be in the range of (-180, 180]
+    convert the longitude to be in the range of (-180, 180]
     """
-    return lon if lon <= 180 else lon - 360;
+    return lon if lon <= 180 else lon - 360
 
 def phi_angular_speed(speed, radius, height, bearing) -> float:
     """
