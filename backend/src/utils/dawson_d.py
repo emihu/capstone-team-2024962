@@ -1,41 +1,33 @@
 import math
 
-# variables and functions defined elsewhere
-RA = 1 # placeholder
-Dec = 1 # placeholder
-
-def NN(tt):
-    return
-
-def MM(tt):
-    return
-
 # d2
 # distance to fov for path 1
-def distance_to_fov_path_1(bb, tt, gg):
-    return math.sqrt(math.pow((xaax(tt) - math.sqrt(math.sin(bb)*math.sin(bb) - gg*yaay(tt)*yaay(tt))), 2) + math.pow(math.cos(bb)*zaaz(tt), 2))
+def distance_to_fov_path_1(bb, NN, MM, RA, Dec, gg):
+    return math.sqrt(math.pow((xaax(NN, MM, RA) - math.sqrt(math.sin(bb)*math.sin(bb) - \
+        gg*yaay(NN, MM, RA, Dec)*yaay(NN, MM, RA, Dec))), 2) + math.pow(math.cos(bb)*zaaz(NN, MM, RA, Dec), 2))
 
 # distance to fov for path 2
-def distance_to_fov_path_2(bb, tt, gg):
-    return math.sqrt(math.pow((xaax(tt) + math.sqrt(math.sin(bb)*math.sin(bb) - gg*yaay(tt)*yaay(tt))), 2) + math.pow(math.cos(bb)*zaaz(tt), 2))
+def distance_to_fov_path_2(bb, NN, MM, RA, Dec, gg):
+    return math.sqrt(math.pow((xaax(NN, MM, RA) + math.sqrt(math.sin(bb)*math.sin(bb) - \
+        gg*yaay(NN, MM, RA, Dec)*yaay(NN, MM, RA, Dec))), 2) + math.pow(math.cos(bb)*zaaz(NN, MM, RA, Dec), 2))
 
 # produces a 1 when yaay(tt) = +sin(bb)
-def puo(tt, bb):
-    if (yaay(tt) == math.sin(bb)):
+def puo(NN, MM, RA, Dec, bb):
+    if (yaay(NN, MM, RA, Dec) == math.sin(bb)):
         return 1
     else:
         return 0
 
 # produces 1 when yaay(tt) = -sin(bb)
-def guo(tt, bb):
-    if (yaay(tt) == -math.sin(bb)):
+def guo(NN, MM, RA, Dec, bb):
+    if (yaay(NN, MM, RA, Dec) == -math.sin(bb)):
         return 1
     else:
         return 0
 
 # check if y coord is within fov
-def check_within_fov(bb, tt):
-    if -math.sin(bb) <= yaay(tt) <= math.sin(bb):
+def check_within_fov(bb, NN, MM, RA, Dec):
+    if -math.sin(bb) <= yaay(NN, MM, RA, Dec) <= math.sin(bb):
         return 1
     else:
         return 0
@@ -68,13 +60,17 @@ def d2():
     ddis = 0.01 # window of tolerance
     bb = 1 # filler
     tt = 1 # filler
+    NN = NN(tt)
+    MM = MM(tt)
+    RA = 1 # placeholder
+    Dec = 1 # placeholder
 
     # check if y coordinate is within fov bounds
-    gg = check_within_fov(bb, tt) # chatgpt logic
+    gg = check_within_fov(bb, NN, MM, RA, Dec) # chatgpt logic
 
     # calculate distances
-    d1 = distance_to_fov_path_1(bb, tt, gg)
-    d2 = distance_to_fov_path_2(bb, tt, gg)
+    d1 = distance_to_fov_path_1(bb, NN, MM, RA, Dec, gg)
+    d2 = distance_to_fov_path_2(bb, NN, MM, RA, Dec, gg)
 
     # find intersection time
     tint1 = intersection_time(d1, ddis)
@@ -84,39 +80,44 @@ def d2():
 
 #d3
 # x component of aircraft
-def xacel(tt):
-    return -math.sin(math.radians(NN(tt))) * math.sin(math.pi / 2 - math.radians(MM(tt)))
+def xacel(NN, MM):
+    return -math.sin(math.radians(NN)) * math.sin(math.pi / 2 - math.radians(MM))
 
 # y component of aircraft
-def yacel(tt):
-    return math.cos(math.radians(NN(tt))) * math.sin(math.pi / 2 - math.radians(MM(tt)))
+def yacel(NN, MM):
+    return math.cos(math.radians(NN)) * math.sin(math.pi / 2 - math.radians(MM))
 
 # z component of aircraft
-def zacel(tt):
-    return math.cos(math.pi / 2 - math.radians(MM(tt)))
+def zacel(NN, MM):
+    return math.cos(math.pi / 2 - math.radians(MM))
 
 # x component of aircraft projected
-def xaax(tt):
-    return math.cos(math.radians(RA)) * xacel(tt) + math.sin(math.radians(RA)) * yacel(tt)
+def xaax(NN, MM, RA):
+    return math.cos(math.radians(RA)) * xacel(NN, MM) + math.sin(math.radians(RA)) * yacel(NN, MM)
 
 # y component of aircraft projected
-def yaay(tt):
+def yaay(NN, MM, RA, Dec):
     cos_dec = math.cos(math.pi / 2 - math.radians(Dec))
     sin_dec = math.sin(math.pi / 2 - math.radians(Dec))
 
-    return (-math.sin(math.radians(RA)) * cos_dec * xacel(tt) + 
-            math.cos(math.radians(RA)) * cos_dec * yacel(tt) - 
-            sin_dec * zacel(tt))
+    return (-math.sin(math.radians(RA)) * cos_dec * xacel(NN, MM) + 
+            math.cos(math.radians(RA)) * cos_dec * yacel(NN, MM) - 
+            sin_dec * zacel(NN, MM))
 
 # z component of aircraft projected
-def zaaz(tt):
+def zaaz(NN, MM, RA, Dec):
     cos_dec = math.cos(math.pi / 2 - math.radians(Dec))
     sin_dec = math.sin(math.pi / 2 - math.radians(Dec))
 
-    return (-math.sin(math.radians(RA)) * sin_dec * xacel(tt) + 
-            math.cos(math.radians(RA)) * sin_dec * yacel(tt) + 
-            cos_dec * zacel(tt))
+    return (-math.sin(math.radians(RA)) * sin_dec * xacel(NN, MM) + 
+            math.cos(math.radians(RA)) * sin_dec * yacel(NN, MM) + 
+            cos_dec * zacel(NN, MM))
 
 def d3():
     tt = 1 # filler
-    ftt = 10 * [xaax(tt), yaay(tt), zaaz(tt)]
+    # variables and functions defined elsewhere
+    NN = NN(tt)
+    MM = MM(tt)
+    RA = 1 # placeholder
+    Dec = 1 # placeholder
+    ftt = 10 * [xaax(NN, MM, RA), yaay(NN, MM, RA, Dec), zaaz(NN, MM, RA, Dec)]
