@@ -216,7 +216,7 @@ function FlightPredictor() {
 
           <div className="row g-3 align-items-center input-field">
             <div className="col-sm-2">
-              <label className="form-label">Camera Sensor Size</label>
+              <label className="form-label">Camera Sensor Diagonal Dimension</label>
             </div>
             <div className="col-auto">
               <input
@@ -252,7 +252,7 @@ function FlightPredictor() {
 
           <div className="row g-3 align-items-center input-field">
             <div className="col-sm-2">
-              <label className="form-label">Exposure</label>
+              <label className="form-label">Exposure Time</label>
             </div>
             <div className="col-auto">
               <input
@@ -327,6 +327,55 @@ function FlightPredictor() {
               <span className="form-text">deg</span>
             </div>
           </div>
+
+          <div className="row g-3 align-items-center input-field">
+            <div className="col-sm-2">
+              <label className="form-label">Latitude</label>
+            </div>
+            <div className="col-auto">
+              <input
+                type="text"
+                className="form-control"
+                name="latitude"
+              />
+            </div>
+            <div className="col-auto">
+              <span className="form-text">deg</span>
+            </div>
+          </div>
+
+          <div className="row g-3 align-items-center input-field">
+            <div className="col-sm-2">
+              <label className="form-label">Longitude</label>
+            </div>
+            <div className="col-auto">
+              <input
+                type="text"
+                className="form-control"
+                name="longitude"
+              />
+            </div>
+            <div className="col-auto">
+              <span className="form-text">deg</span>
+            </div>
+          </div>
+
+          <div className="row g-3 align-items-center input-field">
+            <div className="col-sm-2">
+              <label className="form-label">Altitude</label>
+            </div>
+            <div className="col-auto">
+              <input
+                type="text"
+                className="form-control"
+                name="longitude"
+              />
+            </div>
+            <div className="col-auto">
+              <span className="form-text">m above sea level</span>
+            </div>
+          </div>
+
           <div className="mb-3 input-field">
             <label className="form-label">Select Flight Data Source</label>
             <div className="form-check">
