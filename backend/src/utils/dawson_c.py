@@ -1,5 +1,5 @@
 import math
-from dawsonv2 import get_local_sidereal_time
+from localsidereal import get_local_sidereal_time
 
 from latlon_helper import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, EARTH_RADIUS_METER
 
