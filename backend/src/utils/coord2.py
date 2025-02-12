@@ -146,6 +146,6 @@ if __name__ == "__main__":
     vector = dawson_c.aircraft_vector_from_gps(
         user_gps_cartesian, aircraft_gps_cartesian)
 
-    RA, Dec = dawson_c.altele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), test_lat)
+    RA, Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), test_lat)
 
     print(f"{RA}, {Dec}")

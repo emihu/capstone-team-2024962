@@ -33,7 +33,7 @@ def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, fl
         vector = dawson_c.aircraft_vector_from_gps(
             user_gps_cartesian, aircraft_gps_cartesian)
 
-        flight.RA, flight.Dec = dawson_c.altele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
+        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
     
     return flight_data
         

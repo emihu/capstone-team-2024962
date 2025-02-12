@@ -76,7 +76,7 @@ def azimuth_elevation_from_vector(vector: tuple)->tuple[float, float]:
     elevation = math.atan2(z, math.sqrt(x**2 + y**2))
     return (azimuth, elevation)
 
-def altele_to_radec(azele: tuple[float, float], gps_lat)->tuple[float, float]:
+def aziele_to_radec(azele: tuple[float, float], gps_lat)->tuple[float, float]:
     """
     Convert the azimuth and elevation to right ascension and declination.
     :return: Right Ascension in degrees, Declination in degrees.
