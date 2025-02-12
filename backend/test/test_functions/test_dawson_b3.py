@@ -72,6 +72,8 @@ def test_theta_angular_speed(speed, radius, height, bearing, time_shift, origina
     (150, 6371000, 5000, 180, 20, -30, 120, 2.09),
     (250, 6371000, 20000, 45, 15, 60, 10, 0.18),
     (200, 6371000, 10000, 90, 10, 0, -180, 3.14),  # Expected wraparound value for International Date Line
+    # Test) aircraft only moving in the theta direction
+    (200, constants.EARTH_RADIUS_METER, 10000, 90, 50116.25681, 0, 0, math.pi/2),
 ])
 def test_theta_current_position(speed, radius, height, bearing, time_shift, original_latitude, original_longitude, expected):
     result = theta_current_position(speed, radius, height, bearing, time_shift, original_latitude, original_longitude)
