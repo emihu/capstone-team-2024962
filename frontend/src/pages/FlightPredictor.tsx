@@ -25,8 +25,14 @@ function FlightPredictor() {
   const [fovCenterRaM, setFCRM] = useState("");
   const [fovCenterRaS, setFCRS] = useState("");
   const [fovCenterDec, setFCD] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [altitude, setAltitude] = useState("");
+  const [altitudeUnit, setAltitudeUnit] = useState("m");
   const [flightDataType, setFlightDataType] = useState("live"); // 'live' or 'simulated'
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]); // Manage simulated flights
+  const [simulatedFlightAltitudeUnit, setSimulatedFlightAltitudeUnit] = useState("ft");
+  const [simulatedFlightSpeedUnit, setSimulatedFlightSpeedUnit] = useState("knots");
   const [newFlight, setNewFlight] = useState({
     altitude: "",
     speed: "",
@@ -34,6 +40,8 @@ function FlightPredictor() {
     longitude: "",
     heading: "",
   });
+  
+  
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -105,6 +113,13 @@ function FlightPredictor() {
     setIsUpdating(false);
     event.preventDefault();
 
+    // Convert altitude to meters if the unit is feet
+    let altitudeInMeters = parseFloat(altitude);
+    if (altitudeUnit === "ft") {
+      altitudeInMeters = altitudeInMeters * 0.3048;
+      setAltitude(altitudeInMeters.toString());
+    }
+    
     // Update state variables explicitly (if needed)
     setFL(focalLength); // Ensures the most current value is set
     setCSS(cameraSensorSize);
@@ -114,6 +129,9 @@ function FlightPredictor() {
     setFCRM(fovCenterRaM);
     setFCRS(fovCenterRaS);
     setFCD(fovCenterDec);
+    setLatitude(latitude);
+    setLongitude(longitude);
+    setAltitude(altitude);
 
     // Call API with the current state values
     fetchFlightData();
@@ -131,8 +149,23 @@ function FlightPredictor() {
       return;
     }
 
-    const altitudeValue = parseFloat(altitude);
-    const speedValue = parseFloat(speed);
+    // Convert altitude and speed to ft and knots to match FR24 API
+    let altitudeValue: number;
+    if (simulatedFlightAltitudeUnit === "ft") {
+      altitudeValue = parseFloat(altitude);
+    } else {
+      altitudeValue = parseFloat(altitude) * 3.28084;
+    }
+
+    let speedValue: number;
+    if (simulatedFlightSpeedUnit === "kph") {
+      speedValue = parseFloat(speed) * 0.539957;
+    } else if (simulatedFlightSpeedUnit === "mph") {
+      speedValue = parseFloat(speed) * 0.868976;
+    } else {
+      speedValue = parseFloat(speed);
+    }
+
     const latitudeValue = parseFloat(latitude);
     const longitudeValue = parseFloat(longitude);
     const headingValue = parseFloat(heading);
@@ -337,6 +370,8 @@ function FlightPredictor() {
                 type="text"
                 className="form-control"
                 name="latitude"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
               />
             </div>
             <div className="col-auto">
@@ -353,6 +388,8 @@ function FlightPredictor() {
                 type="text"
                 className="form-control"
                 name="longitude"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
               />
             </div>
             <div className="col-auto">
@@ -368,11 +405,20 @@ function FlightPredictor() {
               <input
                 type="text"
                 className="form-control"
-                name="longitude"
+                name="altitude"
+                value={altitude}
+                onChange={(e) => setAltitude(e.target.value)}
               />
             </div>
             <div className="col-auto">
-              <span className="form-text">m above sea level</span>
+              <select
+                className="form-select"
+                value={altitudeUnit}
+                onChange={(e) => setAltitudeUnit(e.target.value)}
+              >
+                <option value="m">m above sea level</option>
+                <option value="ft">ft above sea level</option>
+              </select>
             </div>
           </div>
 
@@ -426,7 +472,14 @@ function FlightPredictor() {
                   />
                 </div>
                 <div className="col-auto">
-                  <span className="form-text">feet</span>
+                  <select
+                    className="form-select"
+                    value={simulatedFlightAltitudeUnit}
+                    onChange={(e) => setSimulatedFlightAltitudeUnit(e.target.value)}
+                  >
+                    <option value="m">m</option>
+                    <option value="ft">ft</option>
+                  </select>
                 </div>
               </div>
 
@@ -445,7 +498,15 @@ function FlightPredictor() {
                   />
                 </div>
                 <div className="col-auto">
-                  <span className="form-text">knots</span>
+                <select
+                    className="form-select"
+                    value={simulatedFlightSpeedUnit}
+                    onChange={(e) => setSimulatedFlightSpeedUnit(e.target.value)}
+                  >
+                    <option value="m">knots</option>
+                    <option value="kph">km/h</option>
+                    <option value="mph">mi/h</option>
+                  </select>
                 </div>
               </div>
 
