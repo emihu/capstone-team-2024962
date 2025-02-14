@@ -55,15 +55,13 @@ def start_end_intersection_time(tt, tint1, tint2, tintem):
     else:
         return 0
 
-def d2():
+def d2(fov, tt, NN, MM, RA, Dec):
     # vars
+    # NN, MM is RA, dec of the plane
+    # RA, Dec is RA, dec of the star
+    # bb is fov in rad
+    bb = math.radians(fov)
     ddis = 0.01 # window of tolerance
-    bb = 1 # filler
-    tt = 1 # filler
-    NN = NN(tt)
-    MM = MM(tt)
-    RA = 1 # placeholder
-    Dec = 1 # placeholder
 
     # check if y coordinate is within fov bounds
     gg = check_within_fov(bb, NN, MM, RA, Dec) # chatgpt logic
@@ -88,7 +86,7 @@ def yacel(NN, MM):
     return math.cos(math.radians(NN)) * math.sin(math.pi / 2 - math.radians(MM))
 
 # z component of aircraft
-def zacel(NN, MM):
+def zacel(MM):
     return math.cos(math.pi / 2 - math.radians(MM))
 
 # x component of aircraft projected
@@ -102,7 +100,7 @@ def yaay(NN, MM, RA, Dec):
 
     return (-math.sin(math.radians(RA)) * cos_dec * xacel(NN, MM) + 
             math.cos(math.radians(RA)) * cos_dec * yacel(NN, MM) - 
-            sin_dec * zacel(NN, MM))
+            sin_dec * zacel(MM))
 
 # z component of aircraft projected
 def zaaz(NN, MM, RA, Dec):
@@ -111,13 +109,7 @@ def zaaz(NN, MM, RA, Dec):
 
     return (-math.sin(math.radians(RA)) * sin_dec * xacel(NN, MM) + 
             math.cos(math.radians(RA)) * sin_dec * yacel(NN, MM) + 
-            cos_dec * zacel(NN, MM))
+            cos_dec * zacel(MM))
 
-def d3():
-    tt = 1 # filler
-    # variables and functions defined elsewhere
-    NN = NN(tt)
-    MM = MM(tt)
-    RA = 1 # placeholder
-    Dec = 1 # placeholder
+def d3(NN, MM, RA, Dec):
     ftt = 10 * [xaax(NN, MM, RA), yaay(NN, MM, RA, Dec), zaaz(NN, MM, RA, Dec)]

@@ -3,9 +3,16 @@ from datatypes import flightInfo
 from astropy.time import Time
 import dawson_b3
 import dawson_c
+import dawson_d
 from constants import EARTH_RADIUS
 
-def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, elapsed_time: float):
+def find_flights (flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, fov: float, fov_center: dict[str, float]):
+    for x in range(0, 180):
+        set_ra_dec_for_flights(flight_data, user_gps, x, fov, fov_center)
+
+    return 
+
+def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, elapsed_time: float, fov: float, fov_center: dict[str, float]):
     """
     Set the RA and Dec for each flight in the flight data.
     
@@ -34,6 +41,8 @@ def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, fl
             user_gps_cartesian, aircraft_gps_cartesian)
 
         flight.RA, flight.Dec = dawson_c.altele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
+
+        tt = dawson_d.d2(fov, tt, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"]) # change return
     
     return flight_data
         
