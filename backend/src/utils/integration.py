@@ -1,28 +1,57 @@
 
+import math
 from datatypes import flightInfo
 from astropy.time import Time
 import dawson_b3
 import dawson_c
 import dawson_d
+import utils.flight_api as fa
+import utils.coord 
+import fov
 from constants import EARTH_RADIUS
+import datetime
+from collections import deque
 
-def find_flights (flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, fov: float, fov_center: dict[str, float]):
-    for x in range(0, 180):
-        set_ra_dec_for_flights(flight_data, user_gps, x, fov, fov_center)
-
-    return 
-
-def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, elapsed_time: float, fov: float, fov_center: dict[str, float]):
+def find_flights_in_horizon (observer_lat, observer_lon):
     """
-    Set the RA and Dec for each flight in the flight data.
-    
-    Parameters
-    ----------
-    flight_data : list of flightInfo
-        The flight data to update.
-    observer_time : astropy.time.Time
-        The time of the observer.
+    Find flights within the observer's horizon.
+
+    Parameters:
+        observer_lat (float): Observer's latitude in degrees.
+        observer_lon (float): Observer's longitude in degrees.
+        observer_alt (float): Observer's altitude in meters.
+
+    Returns:
+        list: Flight data from the API within the calculated horizon.
     """
+    # Earth's radius in meters
+    EARTH_RADIUS = 6371000  
+
+    # based on max alt of plane
+    horizon_distance = 12801.6
+
+    # Convert horizon radius from meters to degrees (approximate conversion)
+    radius_deg = (horizon_distance / EARTH_RADIUS) * (180 / math.pi)
+
+    # Query API with calculated circular boundary
+    flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, radius_deg)
+
+    #return flight_data
+    return flight_data
+
+def find_flights_intersecting (flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None,
+                               fov_size: float, fov_center: dict[str, float], observer_lat, observer_lon):
+    flight_data = find_flights_in_horizon(observer_lat, observer_lon, observer_alt=12801.6) 
+
+    flight_intersections_queue = deque()
+
+    for time_delta in range(0, 180, 5): 
+        flight_intersections_queue = check_intersection(flight_data, user_gps, observer_time, time_delta, fov_size, fov_center, flight_intersections_queue)    
+
+    return flight_intersections_queue
+
+def check_intersection(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, \
+                       elapsed_time: float, fov_size: float, fov_center: dict[str, float], flight_intersections_queue: deque):
     if observer_time is None:
         observer_time = Time.now()
         
@@ -42,9 +71,15 @@ def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, fl
 
         flight.RA, flight.Dec = dawson_c.altele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
 
-        tt = dawson_d.d2(fov, tt, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"]) # change return
+        intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"]) # change return
+
+        if intersection_check:
+            if not any(flight[1] == flight.flightNumber for flight in flight_intersections_queue): # check if the plane is entering or exiting
+                flight_intersections_queue.append((elapsed_time, flight.flightNumber, 0))
+            else:
+                flight_intersections_queue.append((elapsed_time, flight.flightNumber, 1))
     
-    return flight_data
+    return flight_intersections_queue
         
 
 

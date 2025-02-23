@@ -47,15 +47,15 @@ def intersection_time_endpoint(tint1, tint2):
         return 0
 
 # return the time if it intersects
-def start_end_intersection_time(tt, tint1, tint2, tintem):
+def start_end_intersection_time(tint1, tint2, tintem):
     if (tint1 or tint2) and (1 - tintem):
-        return tt
+        return True
     elif ((tint1 + tint2) / 2) and (tintem):
-        return tt
+        return True
     else:
-        return 0
+        return False
 
-def d2(fov, tt, NN, MM, RA, Dec):
+def d2(fov, NN, MM, RA, Dec):
     # vars
     # NN, MM is RA, dec of the plane
     # RA, Dec is RA, dec of the star
@@ -74,7 +74,9 @@ def d2(fov, tt, NN, MM, RA, Dec):
     tint1 = intersection_time(d1, ddis)
     tint2 = intersection_time(d2, ddis)
     tintem = intersection_time_endpoint(tint1, tint2)
-    tintse = start_end_intersection_time(tt, tint1, tint2, tintem) # time of intersection
+    intersection_check = start_end_intersection_time(tint1, tint2, tintem) 
+
+    return intersection_check
 
 #d3
 # x component of aircraft
