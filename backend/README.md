@@ -2,6 +2,14 @@
 
 This is the backend
 
+## Setting up the environment and running the application
+
+1. Ensure you are at the backend directory, check by doing `pwd` and it should be `{project_root}/backend`
+
+2. Export `PYTHONPATH` to be the backend directory
+
+3. Run `python src/app.py`
+
 ## Prerequisites
 
 Before you start, make sure you have the following installed:

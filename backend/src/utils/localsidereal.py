@@ -7,7 +7,7 @@ from datetime import datetime
 from timezonefinder import TimezoneFinder
 from pytz import timezone
 
-import coord
+import src.utils.coord
 
 # my current lat lon
 myLat = 43.665417

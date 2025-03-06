@@ -1,7 +1,7 @@
 import math
-from dawsonv2 import get_local_sidereal_time
+from src.utils.localsidereal import get_local_sidereal_time
 
-from latlon_helper import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, EARTH_RADIUS_METER
+from src.utils.latlon_helper import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, EARTH_RADIUS_METER
 
 
 def spherical_to_cartesian(r, theta, phi) -> tuple[float, float, float]:
@@ -76,7 +76,7 @@ def azimuth_elevation_from_vector(vector: tuple)->tuple[float, float]:
     elevation = math.atan2(z, math.sqrt(x**2 + y**2))
     return (azimuth, elevation)
 
-def altele_to_radec(azele: tuple[float, float], gps_lat)->tuple[float, float]:
+def aziele_to_radec(azele: tuple[float, float], gps_lat)->tuple[float, float]:
     """
     Convert the azimuth and elevation to right ascension and declination.
     :return: Right Ascension in degrees, Declination in degrees.
