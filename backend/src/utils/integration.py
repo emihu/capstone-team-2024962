@@ -10,15 +10,13 @@ import fov
 from constants import EARTH_RADIUS_METER
 import datetime
 from collections import deque
-
+# todo: create data class
 def find_flights_intersecting (focal_length: float, camera_sensor_size: float, barlow_reducer_factor: float, exposure: float, 
                                fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float, 
                                observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights):
     # get fov
     fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
-    result = coord.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms")
-    fov_center_lat = result[0].value
-    fov_center_lon = result[1].value
+    fov_center_lat, fov_center_lon = coord.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms")
 
     # get horizon
     if flight_data_type == "live":
@@ -29,7 +27,8 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     # loop through flights to check for intersections
     flight_intersections_queue = deque()
     user_gps = {"latitude": observer_lat, "longitude": observer_lon}
-    fov_center = {"RA": fov_center_lat, "Dec": fov_center_dec} # CHANGE THIS
+    fov_center_ra = coord.HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s)
+    fov_center = {"RA": fov_center_ra.to_degrees(), "Dec": fov_center_dec} 
 
     for time_delta in range(0, 180, 5): 
         temp_queue = check_intersection(flight_data, user_gps, None, time_delta, fov_size, fov_center)    

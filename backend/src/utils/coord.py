@@ -91,7 +91,7 @@ def convert_ra_dec_to_lat_lon(*, ra, dec, time=None, ra_format="deg"):
     lat = Latitude(dec * u.deg)
 
 
-    return (lat, lon)
+    return (lat.value, lon.value)
 
 
 """
