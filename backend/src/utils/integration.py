@@ -8,7 +8,7 @@ import dawson_d
 import coord 
 import fov
 from constants import EARTH_RADIUS_METER
-import datetime
+from datetime import timedelta
 from collections import deque
 # todo: create data class
 def find_flights_intersecting (focal_length: float, camera_sensor_size: float, barlow_reducer_factor: float, exposure: float, 
@@ -25,24 +25,24 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
 
     # loop through flights to check for intersections
-    flight_intersections_queue = deque()
     user_gps = {"latitude": observer_lat, "longitude": observer_lon}
     fov_center_ra = coord.HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s)
     fov_center = {"RA": fov_center_ra.to_degrees(), "Dec": fov_center_dec} 
 
+    flights_in_fov = set()
+    flights_position = list()
     for time_delta in range(0, 180, 5): 
-        temp_queue = check_intersection(flight_data, user_gps, None, time_delta, fov_size, fov_center)    
-        flight_intersections_queue.append(temp_queue)
+        check_intersection(flight_data, user_gps, None, time_delta, fov_size, fov_center, flights_in_fov, flights_position)    
 
-    return flight_intersections_queue
+    return flights_position
 
 
 def check_intersection(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, \
-                       elapsed_time: float, fov_size: float, fov_center: dict[str, float]):
+                       elapsed_time: float, fov_size: float, fov_center: dict[str, float], flights_in_fov: set, flights_position: list):
     if observer_time is None:
         observer_time = Time.now()
 
-    flight_intersections_queue = deque()
+    curr_flight_positions = list()
         
     for flight in flight_data:
         
@@ -58,17 +58,26 @@ def check_intersection(flight_data: list[flightInfo], user_gps: dict[str, float]
         vector = dawson_c.aircraft_vector_from_gps(
             user_gps_cartesian, aircraft_gps_cartesian)
 
-        flight.RA, flight.Dec = dawson_c.altele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
+        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
 
         intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"]) # change return
 
+        # add flight if entering/exiting the fov
         if intersection_check:
-            if not any(flight_in_queue[1] == flight.flightNumber for flight_in_queue in flight_intersections_queue): # check if the plane is entering or exiting
-                flight_intersections_queue.append((elapsed_time, flight.flightNumber, 0))
+            if flight.flightNumber not in flights_in_fov:
+                flights_in_fov.add(flight.flightNumber)
+                flight.enter = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
             else:
-                flight_intersections_queue.append((elapsed_time, flight.flightNumber, 1))
-    
-    return flight_intersections_queue
+                flights_in_fov.discard(flight.flightNumber)
+                flight.exit = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
+
+        # add position of the flight if in fov
+        if flight.flightNumber in flights_in_fov:
+            curr_flight_positions.append({"flightNumber": flight.flightNumber, "RA": flight.RA, "Dec": flight.Dec})
+
+    # add all of the flight positions of flights within the fov at this timestamp
+    flights_position.append(curr_flight_positions)
+
         
 
 
