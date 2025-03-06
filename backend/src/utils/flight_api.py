@@ -1,3 +1,4 @@
+from datatypes import flightInfo
 ### Functions that interact with the flight API ###
 
 ## API documentation: https://jeanextreme002.github.io/FlightRadarAPI/
@@ -10,14 +11,14 @@ from FlightRadar24 import FlightRadar24API
 def get_flight_info(flights):
     flight_info = []
     for flight in flights:
-        flight_info.append({
-            "flight_number": flight.number,
-            "latitude": flight.latitude,
-            "longitude": flight.longitude, 
-            "altitude": flight.altitude, # in feet
-            "speed": flight.ground_speed, # in knots
-            "heading": flight.heading # 0 is north, 90 is east, 180 is south, 270 is west
-        })
+        flight_info.append(flightInfo(
+            flightNumber = flight.number,
+            latitude=flight.latitude,
+            longitude=flight.longitude,
+            altitude=flight.altitude,  # in feet
+            speed=flight.ground_speed,  # in knots
+            heading=flight.heading  # 0 is north, 90 is east, 180 is south, 270 is west
+        ))
 
     return flight_info
 
