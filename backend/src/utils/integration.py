@@ -58,7 +58,7 @@ def check_intersection(flight_data: list[flightInfo], user_gps: dict[str, float]
         vector = dawson_c.aircraft_vector_from_gps(
             user_gps_cartesian, aircraft_gps_cartesian)
 
-        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
+        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'], user_gps['longitude'])
 
         intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"]) # change return
 
