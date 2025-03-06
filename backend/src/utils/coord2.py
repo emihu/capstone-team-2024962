@@ -1,7 +1,7 @@
 
 from astropy.time import Time
 from astropy import units as u
-from astropy.coordinates import SkyCoord, Longitude, Latitude
+from astropy.coordinates import EarthLocation, ICRS, AltAz, ITRS, SkyCoord, Longitude, Latitude
 from dataclasses import dataclass
 import dawson_b3
 import dawson_c
@@ -106,6 +106,50 @@ def convert_ra_dec_to_lat_lon(*, ra, dec, time=None, ra_format="deg"):
 
     return (sub_lat, sub_lon)
 
+
+def convert_lat_lon_to_ra_dec(
+    *,
+    sky_obj_lat,
+    sky_obj_lon,
+    sky_obj_alt,
+    obs_lat,
+    obs_lon,
+    obs_alt,
+    observer_time=None
+):
+    # Use the current time if no observer_time is provided.
+    if observer_time is None:
+        observer_time = Time.now()
+    
+    # Define the observer's and object's locations.
+    observer_location = EarthLocation(lat=obs_lat * u.deg,
+                                      lon=obs_lon * u.deg,
+                                      height=obs_alt * u.m)
+    
+    object_location = EarthLocation(lat=sky_obj_lat * u.deg,
+                                    lon=sky_obj_lon * u.deg,
+                                    height=sky_obj_alt * u.m)
+    
+    # Get the ITRS coordinates for both the object and observer.
+    itrs_obj = object_location.get_itrs(obstime=observer_time)
+    itrs_obs = observer_location.get_itrs(obstime=observer_time)
+    
+    # Compute the topocentric vector: the object's position relative to the observer.
+    topo_vector = itrs_obj.cartesian - itrs_obs.cartesian
+    
+    # Create a SkyCoord from the topocentric vector in the ITRS frame.
+    topo_coord = SkyCoord(topo_vector, frame=ITRS(obstime=observer_time))
+    
+    # Transform the topocentric coordinate into the AltAz frame.
+    altaz_frame = AltAz(obstime=observer_time, location=observer_location)
+    obj_altaz = topo_coord.transform_to(altaz_frame)
+    
+    # Finally, transform from AltAz to ICRS to obtain RA and Dec.
+    obj_icrs = obj_altaz.transform_to(ICRS())
+    
+    return (obj_icrs.ra, obj_icrs.dec)
+
+
 # Example usage:
 if __name__ == "__main__":
     # Example: Using RA in HMS format
@@ -123,29 +167,47 @@ if __name__ == "__main__":
     print(f"Subpoint Latitude: {lat}")
     print(f"Subpoint Longitude: {lon}")
 
-    
-    
-    
-    test_lon = -79.3832
-    test_lat = 43.6532
-    test_time = Time.now()
-    speed = 0
-    bearing = 0
-    elapsed_time = 0
-    altitude = 10000
-    
-    phi = dawson_b3.phi_current_position(speed, EARTH_RADIUS_METER, altitude, bearing, elapsed_time, test_lat)
-    theta = dawson_b3.theta_current_position(speed, EARTH_RADIUS_METER, altitude, bearing, elapsed_time, test_lat, test_lon)
+    # Define a fixed observation time for repeatability
+    obs_time = Time("2025-03-01T12:00:00")
 
-    user_gps_cartesian = dawson_c.gps_cartesian(
-        test_lat, test_lon)
+    # Observer's location (e.g., somewhere in Toronto)
+    obs_lat = 43.65      # in degrees
+    obs_lon = -79.38     # in degrees
+    obs_alt = 0          # in meters
 
-    aircraft_gps_cartesian = dawson_c.aircraft_theta_phi_to_cartesian(
-        EARTH_RADIUS_METER + altitude, theta, phi)
-    
-    vector = dawson_c.aircraft_vector_from_gps(
-        user_gps_cartesian, aircraft_gps_cartesian)
+    # Flight is directly overhead: same lat and lon but at altitude 10,000 m (10 km)
+    flight_lat = obs_lat
+    flight_lon = obs_lon
+    flight_alt = 10000   # in meters
 
-    RA, Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), test_lat)
+    # Convert the flight's Earth coordinates to RA/Dec as seen by the observer.
+    flight_ra_dec = convert_lat_lon_to_ra_dec(
+        sky_obj_lat=flight_lat,
+        sky_obj_lon=flight_lon,
+        sky_obj_alt=flight_alt,
+        obs_lat=obs_lat,
+        obs_lon=obs_lon,
+        obs_alt=obs_alt,
+        observer_time=obs_time
+    )
+    print("=== Flight RA/Dec (ICRS) ===")
+    print("RA:  ", flight_ra_dec[0])
+    print("Dec: ", flight_ra_dec[1])
+    print("")
 
-    print(f"{RA}, {Dec}")
+    # Now convert the RA/Dec back to the Earth subpoint (lat, lon).
+    subpoint_lat_lon = convert_ra_dec_to_lat_lon(
+        ra=flight_ra_dec[0].deg,   # pass RA in degrees
+        dec=flight_ra_dec[1].deg,  # pass Dec in degrees
+        time=obs_time,
+        ra_format="deg"
+    )
+    print("=== Subpoint (lat, lon) from RA/Dec ===")
+    print("Latitude:  ", subpoint_lat_lon[0])
+    print("Longitude: ", subpoint_lat_lon[1])
+    print("")
+
+    # For a flight directly overhead, we expect the subpoint to match the observer's location.
+    print("=== Observer's Location ===")
+    print("Latitude:  ", obs_lat * u.deg)
+    print("Longitude: ", obs_lon * u.deg)
