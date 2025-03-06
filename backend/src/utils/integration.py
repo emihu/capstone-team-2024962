@@ -34,7 +34,7 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     for time_delta in range(0, 180, 5): 
         check_intersection(flight_data, user_gps, None, time_delta, fov_size, fov_center, flights_in_fov, flights_position)    
 
-    return flights_position
+    return flights_position, flight_data
 
 
 def check_intersection(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, \
@@ -66,7 +66,7 @@ def check_intersection(flight_data: list[flightInfo], user_gps: dict[str, float]
         if intersection_check:
             if flight.flightNumber not in flights_in_fov:
                 flights_in_fov.add(flight.flightNumber)
-                flight.enter = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
+                flight.entry = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
             else:
                 flights_in_fov.discard(flight.flightNumber)
                 flight.exit = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
