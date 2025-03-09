@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.css";
 
 // component imports
 import MapFlights from "../components/MapFlights";
+import FlightTable from "../components/TableFlights";
 
 function FlightPredictor() {
   const [data, setData] = useState<any[]>([]);
@@ -619,39 +620,7 @@ function FlightPredictor() {
             Submit
           </button>
         </form>
-        {data.length === 0 ? (
-          <p>No flights found</p>
-        ) : (
-          <div>
-            <div className="table-responsive">
-              <table className="table table-striped table-bordered table-light">
-                <thead className="thead-dark">
-                  <tr>
-                    <th>Flight Number</th>
-                    <th>Altitude (feet)</th>
-                    <th>Heading (deg)</th>
-                    <th>Latitude (deg)</th>
-                    <th>Longitude (deg)</th>
-                    <th>Speed (knots)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((flight: any, index: number) => (
-                    <tr key={index}>
-                      <td>{flight.flight_number}</td>
-                      <td>{flight.altitude}</td>
-                      <td>{flight.heading}</td>
-                      <td>{flight.latitude}</td>
-                      <td>{flight.longitude}</td>
-                      <td>{flight.speed}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <MapFlights data={data} fovBorder={fovBorder} />
-          </div>
-        )}
+        <FlightTable data={data} fovBorder={fovBorder} />
       </div>
     </>
   );
