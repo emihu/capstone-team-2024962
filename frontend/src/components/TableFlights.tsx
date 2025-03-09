@@ -10,12 +10,11 @@ interface Flight {
   speed: number;
 }
 
-interface FlightTableProps {
+interface TableFlightsProps {
   data: Flight[];
-  fovBorder: any; // Adjust type if possible
 }
 
-const FlightTable: React.FC<FlightTableProps> = ({ data, fovBorder }) => {
+const TableFlights: React.FC<TableFlightsProps> = ({ data }) => {
   return (
     <>
       {data.length === 0 ? (
@@ -48,11 +47,10 @@ const FlightTable: React.FC<FlightTableProps> = ({ data, fovBorder }) => {
               </tbody>
             </table>
           </div>
-          <MapFlights data={data} fovBorder={fovBorder} />
         </div>
       )}
     </>
   );
 };
 
-export default FlightTable;
+export default TableFlights;
