@@ -1,17 +1,17 @@
 
-from datatypes import flightInfo
+from datatypes import ProcessedFlightInfo
 from astropy.time import Time
 import dawson_b3
 import dawson_c
 from constants import EARTH_RADIUS
 
-def set_ra_dec_for_flights(flight_data: list[flightInfo], user_gps: dict[str, float], observer_time: Time | None, elapsed_time: float):
+def set_ra_dec_for_flights(flight_data: list[ProcessedFlightInfo], user_gps: dict[str, float], observer_time: Time | None, elapsed_time: float):
     """
     Set the RA and Dec for each flight in the flight data.
     
     Parameters
     ----------
-    flight_data : list of flightInfo
+    flight_data : list of ProcessedFlightInfo
         The flight data to update.
     observer_time : astropy.time.Time
         The time of the observer.

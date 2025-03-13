@@ -1,6 +1,8 @@
 import math
 import utils.flight_api as fa
 import utils.coord as co
+from datatypes import ProcessedFlightInfo
+import uuid
 
 EARTH_RADIUS = 6371000 # in meters
 
@@ -35,8 +37,9 @@ def haversine(lat1, lon1, lat2, lon2):
     return c * EARTH_RADIUS
 
 # Determines which simulated flights are inside the telescope FOV.
-def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simulated_flights):
-    flights_in_fov = []
+#TODO: refactor this function to use processed flight info
+def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simulated_flights) -> list[ProcessedFlightInfo]:
+    flights_in_fov : list[ProcessedFlightInfo] = []
     
     for flight in simulated_flights:
         flight_lat = flight['latitude']
@@ -44,8 +47,17 @@ def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simula
         distance = haversine(float(fov_center_lat), float(fov_center_lon), float(flight_lat), float(flight_lon))
         
         # If the distance is less than or equal to the radius, the flight is in the circular FOV
+        # TODO: Lawrence please confirm if this is the correct way to populate the data
         if distance <= radius:
-            flights_in_fov.append(flight)
+            flights_in_fov.append(ProcessedFlightInfo(
+                id=uuid.uuid4(),
+                flightNumber=flight['flightNumber'],
+                latitude=flight_lat,
+                longitude=flight_lon,
+                altitude=flight['altitude'],
+                speed=flight['speed'],
+                heading=flight['heading']
+            ))
         
     return flights_in_fov
 
@@ -64,10 +76,12 @@ def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor
 
     print("input: ", fov_center_lat, fov_center_lon, radius)
 
+    # TODO: put the integration function here
     if flight_data_type == "live":
-        flight_info = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
+        flight_info : list[ProcessedFlightInfo] = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
     else:
-        flight_info = find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simulated_flights)
+        flight_info: list[ProcessedFlightInfo] = find_simulated_flights_in_fov(
+            fov_center_lat, fov_center_lon, radius, simulated_flights)
 
     #return flight_info
     return {
