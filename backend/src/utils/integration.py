@@ -1,6 +1,6 @@
 
 import math
-from datatypes import flightInfo
+from datatypes import ProcessedFlightInfo
 from astropy.time import Time
 import dawson_b3
 import dawson_c

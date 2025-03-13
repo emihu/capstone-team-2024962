@@ -1,8 +1,10 @@
-
+import uuid
 from datetime import datetime
 
-class flightInfo:
-    def __init__(self, flightNumber, latitude, longitude, altitude, speed, heading):
+class ProcessedFlightInfo:
+    def __init__(self, id: uuid.UUID, flightNumber: int, latitude: float, 
+                 longitude: float, altitude: float, speed: float, heading: float):
+        self.id = id
         self.flightNumber = flightNumber
         self.latitude = latitude
         self.longitude = longitude
@@ -16,5 +18,5 @@ class flightInfo:
         self.Dec = -1 # caution, declination can also be -1
 
     def __str__(self):
-        return f"{self.flightNumber} {self.latitude} {self.longitude} {self.altitude} {self.speed} {self.heading}"
+        return f"{self.id} {self.flightNumber} {self.latitude} {self.longitude} {self.altitude} {self.speed} {self.heading}"
         
