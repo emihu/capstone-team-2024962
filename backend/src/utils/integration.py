@@ -8,12 +8,13 @@ import dawson_d
 import coord 
 import fov
 from constants import EARTH_RADIUS_METER
-from datetime import timedelta
+from datetime import timedelta, datetime
 from collections import deque
 # todo: create data class
 def find_flights_intersecting (focal_length: float, camera_sensor_size: float, barlow_reducer_factor: float, exposure: float, 
                                fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float, 
-                               observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights):
+                               observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time: datetime | None = None):
+    
     # get fov
     fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
     fov_center_lat, fov_center_lon = coord.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms")
@@ -34,6 +35,7 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     flights_in_fov = set()
     flights_position = list()
     #TODO: play around with the timestep
+    observer_time = None if simulated_time is None else simulated_time
     for elapsed_time in range(0, exposure, 5): 
         check_intersection(flight_data, user_gps, observer_time, elapsed_time, fov_size, fov_center, flights_in_fov, flights_position)    
 

@@ -1,4 +1,5 @@
 import random
+import pytest
 from astropy.time import Time
 from collections import deque
 
@@ -38,15 +39,16 @@ def generate_mock_flights():
         )
     ]
 
-def test_find_flights_in_horizon():
+@pytest.fixture
+def mock_flights():
+    return generate_mock_flights()
+
+def test_find_flights_in_horizon(mock_flights):
     """
     Test the function to detect flights within the observer's horizon.
     """
     observer_lat = 43.7
     observer_lon = -79.4
-
-    # Mock API response by directly returning generated mock flights
-    mock_flights = generate_mock_flights()
 
     # Simulate API function
     def mock_find_flights_in_circ_boundary(lat, lon, radius):
@@ -56,9 +58,8 @@ def test_find_flights_in_horizon():
     flight_data = mock_find_flights_in_circ_boundary(observer_lat, observer_lon, radius=0.043)
 
     assert len(flight_data) > 0, "No flights detected, check calculation"
-    print("test_find_flights_in_horizon passed.")
 
-def test_find_flights_intersecting():
+def test_find_flights_intersecting(mock_flights):
     """
     Test the intersection detection logic.
     """
@@ -69,9 +70,6 @@ def test_find_flights_intersecting():
     user_gps = {"latitude": observer_lat, "longitude": observer_lon}
     fov_size = 1.5  # In degrees
     fov_center = {"RA": 120.0, "Dec": 30.0}
-
-    # Get mock flight data
-    mock_flights = generate_mock_flights()
 
     # Call intersection detection function
     flight_intersections_queue = find_flights_intersecting(
@@ -86,10 +84,3 @@ def test_find_flights_intersecting():
 
     assert isinstance(flight_intersections_queue, deque), "Output should be a deque"
     assert len(flight_intersections_queue) > 0, "No intersections detected"
-    
-    print("test_find_flights_intersecting passed.")
-
-# Run tests
-test_find_flights_in_horizon()
-test_find_flights_intersecting()
-   

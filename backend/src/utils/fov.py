@@ -63,15 +63,15 @@ def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simula
 
 def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor, \
                          fov_center_ra_h, fov_center_ra_m, fov_center_ra_s, \
-                         fov_center_dec, flight_data_type, simulated_flights):
+                         fov_center_dec, flight_data_type, simulated_flights, time=None):
     # find radius of the fov
     fov_size = calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
     radius = abs(fov_degrees_to_meters(fov_size, distance_meters=12801.6))
 
     # convert to lat lon
-    result = co.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms")
-    fov_center_lat = result[0].value
-    fov_center_lon = result[1].value
+    result = co.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms", time=time)
+    fov_center_lat = result[0]
+    fov_center_lon = result[1]
 
     print("input: ", fov_center_lat, fov_center_lon, radius)
 
@@ -94,8 +94,8 @@ def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flig
     query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
     
     for flight in simulated_flights:
-        flight_lat = flight['latitude']
-        flight_lon = flight['longitude']
+        flight_lat = flight.latitude
+        flight_lon = flight.longitude
         distance = haversine(observer_lat, observer_lon, flight_lat, flight_lon)
         
         # If the distance is less than or equal to the radius, the flight is in the circular FOV

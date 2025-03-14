@@ -28,6 +28,7 @@ def flightPrediction():
     altitude = float(data.get('altitude'))
     flight_data_type = data.get('flightDataType')
     simulated_flights = data.get('simulatedFlights')
+    simulated_time = data.get('simulatedTime')
     
     flights_position, flight_data = find_flights_intersecting (focal_length, camera_sensor_size, barlow_reducer_factor, exposure, fov_center_ra_h, \
                                    fov_center_ra_m, fov_center_ra_s, fov_center_dec, longitude, latitude, altitude, flight_data_type, simulated_flights)
