@@ -1,4 +1,4 @@
-import utils.coord as coord
+from src.utils import coord
 import pytest
 from astropy.time import Time
 from astropy.coordinates import Latitude, Longitude

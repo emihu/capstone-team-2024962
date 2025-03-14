@@ -1,4 +1,6 @@
 import uuid
+from datetime import datetime
+
 class ProcessedFlightInfo:
     def __init__(self, id: uuid.UUID, flightNumber: int, latitude: float, 
                  longitude: float, altitude: float, speed: float, heading: float):
@@ -9,7 +11,9 @@ class ProcessedFlightInfo:
         self.altitude = altitude # in feet
         self.speed = speed # in knots
         self.heading = heading # 0 is north, 90 is east, 180 is south, 270 is west
-
+        
+        self.entry : datetime = 0
+        self.exit : datetime = 0
         self.RA = -1 # init to -1 to indicate not set
         self.Dec = -1 # caution, declination can also be -1
 
