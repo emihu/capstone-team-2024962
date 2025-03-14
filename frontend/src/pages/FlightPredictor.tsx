@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import "./FlightPredictor.css";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import "bootstrap/dist/css/bootstrap.css";
+
+import FlightTable from "../components/TableFlights";
+import "./FlightPredictor.css";
 
 function FlightPredictor() {
   const {
@@ -30,7 +32,9 @@ function FlightPredictor() {
     },
   });
 
-  const [data, setData] = useState<any[]>([]);
+  const [flightsPosition, setFlightsPosition] = useState<any[]>([]);
+  const [flightData, setFlightData] = useState<any[]>([]);
+
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
   const [simulatedFlightAltitudeUnit, setSimulatedFlightAltitudeUnit] =
     useState("ft");
@@ -51,7 +55,7 @@ function FlightPredictor() {
       alert("Error: Please add at least one simulated flight.");
       return;
     }
-
+  
     try {
       console.log("Fetching flight data...", formData);
       const response = await axios.post(
@@ -61,7 +65,14 @@ function FlightPredictor() {
           simulatedFlights,
         }
       );
-      setData(response.data.flight_info);
+  
+      // Extract the returned data
+      const { flights_position, flight_data } = response.data;
+  
+      // Set the state variables
+      setFlightsPosition(flights_position);
+      setFlightData(flight_data);
+      
     } catch (error) {
       console.error("Error fetching flight data:", error);
     }
@@ -490,6 +501,7 @@ function FlightPredictor() {
           </button>
         </div>
       </form>
+      <FlightTable data={flightData} />
     </div>
   );
 }

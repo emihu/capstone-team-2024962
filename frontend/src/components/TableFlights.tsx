@@ -1,5 +1,4 @@
 import React from "react";
-import MapFlights from "./MapFlights"; // Adjust the import path as needed
 
 interface Flight {
   flight_number: string;
@@ -8,6 +7,8 @@ interface Flight {
   latitude: number;
   longitude: number;
   speed: number;
+  entry: string;
+  exit: string;
 }
 
 interface TableFlightsProps {
@@ -31,6 +32,8 @@ const TableFlights: React.FC<TableFlightsProps> = ({ data }) => {
                   <th>Latitude (deg)</th>
                   <th>Longitude (deg)</th>
                   <th>Speed (knots)</th>
+                  <th>FOV Entry Time</th>
+                  <th>FOV Exit Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -42,6 +45,8 @@ const TableFlights: React.FC<TableFlightsProps> = ({ data }) => {
                     <td>{flight.latitude}</td>
                     <td>{flight.longitude}</td>
                     <td>{flight.speed}</td>
+                    <td>{flight.entry}</td>
+                    <td>{flight.exit}</td>
                   </tr>
                 ))}
               </tbody>
