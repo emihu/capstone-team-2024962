@@ -1,14 +1,16 @@
 
 from datatypes import ProcessedFlightInfo
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 import dawson_b3
-import dawson_c
 from constants import EARTH_RADIUS
+
+from coord2 import convert_lat_lon_to_ra_dec
+
 
 def set_ra_dec_for_flights(flight_data: list[ProcessedFlightInfo], user_gps: dict[str, float], observer_time: Time | None, elapsed_time: float):
     """
     Set the RA and Dec for each flight in the flight data.
-    
+
     Parameters
     ----------
     flight_data : list of ProcessedFlightInfo
@@ -18,26 +20,25 @@ def set_ra_dec_for_flights(flight_data: list[ProcessedFlightInfo], user_gps: dic
     """
     if observer_time is None:
         observer_time = Time.now()
-        
+
     for flight in flight_data:
-        
-        phi = dawson_b3.phi_current_position(flight.speed, EARTH_RADIUS, flight.altitude, flight.bearing, elapsed_time, flight.latitude)
-        theta = dawson_b3.theta_current_position(flight.speed, EARTH_RADIUS, flight.altitude, flight.bearing, elapsed_time, flight.latitude, flight.longitude)
 
-        user_gps_cartesian = dawson_c.gps_cartesian(
-            user_gps['latitude'], user_gps['longitude'])
+        phi: float = dawson_b3.phi_current_position(
+            flight.speed, EARTH_RADIUS, flight.altitude, flight.bearing, elapsed_time, flight.latitude)
+        theta: float = dawson_b3.theta_current_position(
+            flight.speed, EARTH_RADIUS, flight.altitude, flight.bearing, elapsed_time, flight.latitude, flight.longitude)
 
-        aircraft_gps_cartesian = dawson_c.aircraft_theta_phi_to_cartesian(
-            EARTH_RADIUS + flight.altitude, theta, phi)
-        
-        vector = dawson_c.aircraft_vector_from_gps(
-            user_gps_cartesian, aircraft_gps_cartesian)
+        lat: float = dawson_b3.phi_to_lat(phi)
+        lon: float = dawson_b3.theta_to_lon(theta)
+        alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
 
-        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'])
-    
+        # TODO: check if this is the correct way to calculate the observer time
+        # TODO: test the timezone
+        delta = TimeDelta(elapsed_time, format='sec')
+        observer_time = observer_time + delta
+
+        # TODO: get user altitude from frontend
+        flight.RA, flight.Dec = convert_lat_lon_to_ra_dec(
+            lat, lon, alt, user_gps["latitude"], user_gps["longitude"], 0, observer_time)
+
     return flight_data
-        
-
-
-        
-        
