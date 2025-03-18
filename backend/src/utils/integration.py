@@ -69,7 +69,13 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
         # TODO: get user altitude from frontend
         flight.RA, flight.Dec = convert_lat_lon_to_ra_dec(
-            lat, lon, alt, user_gps["latitude"], user_gps["longitude"], 0, observer_time)
+            sky_obj_lat=lat,
+            sky_obj_lon=lon,
+            sky_obj_alt=alt,
+            obs_lat=user_gps["latitude"],
+            obs_lon=user_gps["longitude"],
+            obs_alt=0,
+            observer_time=observer_time)
 
         intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"])
 
