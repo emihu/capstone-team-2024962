@@ -18,12 +18,16 @@ def rad_to_deg(rad) -> float:
 def phi_to_lat(phi) -> float:
     """
     Convert the phi angle to latitude.
+    phi: The angle in radians.
+    return: The latitude in degrees.
     """
-    return rad_to_deg(90 - phi)
+    return rad_to_deg(math.pi / 2 - phi)
 
 def theta_to_lon(theta) -> float:
     """
     Convert the theta angle to longitude.
+    theta: The angle in radians.
+    return: The longitude in degrees.
     """
     return unconvert_longitude(rad_to_deg(theta))
 
