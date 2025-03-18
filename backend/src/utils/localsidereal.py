@@ -7,7 +7,7 @@ from datetime import datetime
 from timezonefinder import TimezoneFinder
 from pytz import timezone
 
-import src.utils.coord
+import coord as coord
 
 # my current lat lon
 myLat = 43.665417
@@ -18,7 +18,7 @@ def get_local_sidereal_time(lat, lon, time = None):
     Get the local sidereal time at a given gps location
     :param lat: latitude
     :param lon: longitude
-    :param time: time to calculate LST, default is now
+    :param time: time to calculate LST in datetime format, default is now
     :return: LST
     """
     if not time:
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     ra, dec = coord.convert_lat_lon_to_ra_dec(sky_obj_lat=myLat, sky_obj_lon=myLon, sky_obj_alt=0, obs_lat=myLat, obs_lon=myLon, obs_alt=0, observer_time=Time.now()) 
     lat, lon = coord.convert_ra_dec_to_lat_lon(ra=6*15, dec=dec, time=Time.now(), ra_format="deg")
     print(lat, lon)
+    
 
 
     

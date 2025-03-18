@@ -3,8 +3,7 @@ import utils.flight_api as fa
 import utils.coord as co
 from datatypes import ProcessedFlightInfo
 import uuid
-
-EARTH_RADIUS = 6371000 # in meters
+from constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT
 
 def calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor):
     # calculate the FOV size
@@ -34,7 +33,7 @@ def haversine(lat1, lon1, lat2, lon2):
     a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
     c = 2 * math.asin(math.sqrt(a))
     
-    return c * EARTH_RADIUS
+    return c * EARTH_RADIUS_METER
 
 # Determines which simulated flights are inside the telescope FOV.
 #TODO: refactor this function to use processed flight info
@@ -64,15 +63,15 @@ def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simula
 
 def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor, \
                          fov_center_ra_h, fov_center_ra_m, fov_center_ra_s, \
-                         fov_center_dec, flight_data_type, simulated_flights):
+                         fov_center_dec, flight_data_type, simulated_flights, time=None):
     # find radius of the fov
     fov_size = calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
     radius = abs(fov_degrees_to_meters(fov_size, distance_meters=12801.6))
 
     # convert to lat lon
-    result = co.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms")
-    fov_center_lat = result[0].value
-    fov_center_lon = result[1].value
+    result = co.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms", time=time)
+    fov_center_lat = result[0]
+    fov_center_lon = result[1]
 
     print("input: ", fov_center_lat, fov_center_lon, radius)
 
@@ -88,3 +87,25 @@ def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor
         "flight_info": flight_info,
         "fov_border": {"lat": fov_center_lat, "lon": fov_center_lon, "radius": radius}
     }
+
+# Determines which simulated flights are inside the boundary.
+def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights):
+    flight_data = []
+    query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
+    
+    for flight in simulated_flights:
+        flight_lat = flight.latitude
+        flight_lon = flight.longitude
+        distance = haversine(observer_lat, observer_lon, flight_lat, flight_lon)
+        
+        # If the distance is less than or equal to the radius, the flight is in the circular FOV
+        if distance <= query_radius:
+            flight_data.append(flight)
+        
+    return flight_data
+
+def find_live_flights_in_horizon (observer_lat, observer_lon):
+    query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
+    flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, query_radius)
+
+    return flight_data
