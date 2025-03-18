@@ -84,4 +84,6 @@ def test_phi_to_lat():
     assert round(phi_to_lat(0), 2) == 90
     assert round(phi_to_lat(math.pi/2), 2) == 0
     assert round(phi_to_lat(math.pi), 2) == -90
-    assert round(phi_to_lat(-math.pi/2), 2) == 180
+    
+    pytest.raises(ValueError, phi_to_lat, 2*math.pi)
+    pytest.raises(ValueError, phi_to_lat, -math.pi)

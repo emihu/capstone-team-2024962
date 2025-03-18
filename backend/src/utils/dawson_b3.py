@@ -21,6 +21,8 @@ def phi_to_lat(phi) -> float:
     phi: The angle in radians.
     return: The latitude in degrees.
     """
+    if (phi > math.pi or phi < 0):
+        raise ValueError("Phi angle must be less than or equal to pi.")
     return rad_to_deg(math.pi / 2 - phi)
 
 def theta_to_lon(theta) -> float:
@@ -29,6 +31,8 @@ def theta_to_lon(theta) -> float:
     theta: The angle in radians.
     return: The longitude in degrees.
     """
+    if (theta > 2 * math.pi or theta < 0):
+        raise ValueError("Theta angle must be less than or equal to 2pi.")
     return unconvert_longitude(rad_to_deg(theta))
 
 def normalize_longitude(lon) -> float:
