@@ -6,6 +6,7 @@ from src.utils.dawson_b3 import (
     phi_current_position,
     theta_angular_speed,
     theta_current_position,
+    phi_to_lat
 )
 from src.utils import constants
 
@@ -73,8 +74,16 @@ def test_theta_angular_speed(speed, radius, height, bearing, time_shift, origina
     (250, 6371000, 20000, 45, 15, 60, 10, 0.18),
     (200, 6371000, 10000, 90, 10, 0, -180, 3.14),  # Expected wraparound value for International Date Line
     # Test) aircraft only moving in the theta direction
-    (200, constants.EARTH_RADIUS_METER, 10000, 90, 50116.25681, 0, 0, math.pi/2),
+    (200, constants.EARTH_RADIUS_METER, 10000, 90, 50116.25681, 0, 0, 1.57),
 ])
 def test_theta_current_position(speed, radius, height, bearing, time_shift, original_latitude, original_longitude, expected):
     result = theta_current_position(speed, radius, height, bearing, time_shift, original_latitude, original_longitude)
     assert round(result, 2) == expected
+
+def test_phi_to_lat():
+    assert round(phi_to_lat(0), 2) == 90
+    assert round(phi_to_lat(math.pi/2), 2) == 0
+    assert round(phi_to_lat(math.pi), 2) == -90
+    
+    pytest.raises(ValueError, phi_to_lat, 2*math.pi)
+    pytest.raises(ValueError, phi_to_lat, -math.pi)
