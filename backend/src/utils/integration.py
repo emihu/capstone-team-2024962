@@ -1,13 +1,14 @@
 
 import math
 from datatypes import ProcessedFlightInfo
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 import dawson_b3
 import dawson_c
 import dawson_d
 import coord 
 import fov
 from constants import EARTH_RADIUS_METER
+from coord2 import convert_lat_lon_to_ra_dec
 from datetime import timedelta, datetime
 from collections import deque
 # todo: create data class
@@ -49,21 +50,32 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
     curr_flight_positions = list()
         
+
     for flight in flight_data:
-        
-        phi = dawson_b3.phi_current_position(flight.speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude)
-        theta = dawson_b3.theta_current_position(flight.speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude, flight.longitude)
 
-        user_gps_cartesian = dawson_c.gps_cartesian(
-            user_gps['latitude'], user_gps['longitude'])
+        phi: float = dawson_b3.phi_current_position(
+            flight.speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude)
+        theta: float = dawson_b3.theta_current_position(
+            flight.speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude, flight.longitude)
 
-        aircraft_gps_cartesian = dawson_c.aircraft_theta_phi_to_cartesian(
-            EARTH_RADIUS_METER + flight.altitude, theta, phi)
-        
-        vector = dawson_c.aircraft_vector_from_gps(
-            user_gps_cartesian, aircraft_gps_cartesian)
+        lat: float = dawson_b3.phi_to_lat(phi)
+        lon: float = dawson_b3.theta_to_lon(theta)
+        alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
 
-        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'], user_gps['longitude'])
+        # TODO: check if this is the correct way to calculate the observer time
+        # TODO: test the timezone
+        delta = TimeDelta(elapsed_time, format='sec')
+        observer_time = observer_time + delta
+
+        # TODO: get user altitude from frontend
+        flight.RA, flight.Dec = convert_lat_lon_to_ra_dec(
+            sky_obj_lat=lat,
+            sky_obj_lon=lon,
+            sky_obj_alt=alt,
+            obs_lat=user_gps["latitude"],
+            obs_lon=user_gps["longitude"],
+            obs_alt=0,
+            observer_time=observer_time)
 
         intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"])
 
