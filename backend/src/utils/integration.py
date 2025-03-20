@@ -53,10 +53,12 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
     for flight in flight_data:
 
+        speed: float = flight.speed * 0.514444 # convert speed from knots to m/s
+
         phi: float = dawson_b3.phi_current_position(
-            flight.speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude)
+            speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude)
         theta: float = dawson_b3.theta_current_position(
-            flight.speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude, flight.longitude)
+            speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude, flight.longitude)
 
         lat: float = dawson_b3.phi_to_lat(phi)
         lon: float = dawson_b3.theta_to_lon(theta)
@@ -67,6 +69,8 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
         delta = TimeDelta(elapsed_time, format='sec')
         observer_time = observer_time + delta
 
+        print(f"lat, lon: {lat}, {lon}")
+
         # TODO: get user altitude from frontend
         flight.RA, flight.Dec = convert_lat_lon_to_ra_dec(
             sky_obj_lat=lat,
@@ -76,6 +80,8 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
             obs_lon=user_gps["longitude"],
             obs_alt=0,
             observer_time=observer_time)
+        
+        print(f"RA, Dec: {flight.RA}, {flight.Dec}")
 
         intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"])
 
