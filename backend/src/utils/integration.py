@@ -62,12 +62,24 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
         lon: float = dawson_b3.theta_to_lon(theta)
         alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
 
+<<<<<<< Updated upstream
+=======
+        flight.RA, flight.Dec = dawson_c.aziele_to_radec(dawson_c.azimuth_elevation_from_vector(vector), user_gps['latitude'], user_gps['longitude'])
+        lat: float = dawson_b3.phi_to_lat(phi)
+        lon: float = dawson_b3.theta_to_lon(theta)
+        alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
+
+>>>>>>> Stashed changes
         # TODO: check if this is the correct way to calculate the observer time
         # TODO: test the timezone
         delta = TimeDelta(elapsed_time, format='sec')
         observer_time = observer_time + delta
 
         # TODO: get user altitude from frontend
+<<<<<<< Updated upstream
+=======
+        print(lat, lon, alt)
+>>>>>>> Stashed changes
         flight.RA, flight.Dec = convert_lat_lon_to_ra_dec(
             sky_obj_lat=lat,
             sky_obj_lon=lon,
