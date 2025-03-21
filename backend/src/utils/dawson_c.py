@@ -1,40 +1,68 @@
 import math
 from src.utils.localsidereal import get_local_sidereal_time
-
-from src.utils.latlon_helper import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, EARTH_RADIUS_METER
+from src.utils.dawson_b3 import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, lon_to_theta
+from src.utils.constants import EARTH_RADIUS_METER
 
 
 def spherical_to_cartesian(r, theta, phi) -> tuple[float, float, float]:
     """
     Convert spherical coordinates to cartesian coordinates.
+    :param r: The radius.
+    :param theta: The theta angle in spherical coordinates in radians.
+    :param phi: The phi angle in spherical coordinates in radians.
+    :raise ValueError: If phi is not in the range of [0, pi] or theta is not in the range of [0, 2pi].
+    :return: The cartesian coordinates.
     """
+    if (phi > math.pi or phi < 0):
+        raise ValueError("Phi angle must be less than or equal to pi.")
+    if (theta > 2 * math.pi or theta < 0):
+        raise ValueError("Theta angle must be less than or equal to 2pi.")
+
     x = r * math.sin(phi) * math.cos(theta)
     y = r * math.sin(phi) * math.sin(theta)
     z = r * math.cos(phi)
 
     return (x, y, z)
 
-def gps_cartesian(lat, lon)-> tuple[float, float, float]:
+def gps_cartesian(lat, lon, alt)-> tuple[float, float, float]:
     """
     Calculate the cartesian coordinates of the GPS location.
+    :param lat: The latitude in degrees.
+    :param lon: The longitude in degrees.
+    :param alt: The altitude in meters.
+    :return: The cartesian coordinates of the GPS location.
+    :raise ValueError: If the latitude or longitude is out of range.
     """
+    if (lat > 90 or lat < -90):
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+    if (lon > 180 or lon < -180):
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
     # Get phi in radians
     phi = lat_to_phi(lat)
 
     # Get theta in radians, rotated by 90 degrees
-    theta = deg_to_rad(normalize_longitude(lon)) + math.pi/2
+    theta = lon_to_theta(lon) + math.pi/2
 
-    return spherical_to_cartesian(EARTH_RADIUS_METER, theta, phi)
+    return spherical_to_cartesian(EARTH_RADIUS_METER + alt, theta, phi)
 
 
-def aircraft_theta_phi_to_cartesian(radius, theta, phi) -> tuple[float, float, float]:
+def aircraft_theta_phi_to_cartesian(theta, phi, alt) -> tuple[float, float, float]:
     """
     Convert the aircraft's theta and phi to cartesian coordinates.
     Rotate the theta by 90 degrees.
     Need to add 90 Degrees to align with the GPS coordinates.
+    :param theta: The theta angle in radians.
+    :param phi: The phi angle in radians.
+    :param alt: The altitude of the aircraft.
+    raise ValueError: If phi is not in the range of [0, pi] or theta is not in the range of [0, 2pi].
     """
+    if (phi > math.pi or phi < 0):
+        raise ValueError("Phi angle must be less than or equal to pi.")
+    if (theta > 2 * math.pi or theta < 0):
+        raise ValueError("Theta angle must be less than or equal to 2pi.")
+        
     theta = theta + math.pi/2
-    return spherical_to_cartesian(radius, theta, phi)
+    return spherical_to_cartesian(alt + EARTH_RADIUS_METER, theta, phi)
 
 def aircraft_vector_from_gps(gps_cartesian: tuple, aircraft_cartesian: tuple) -> tuple[float, float, float]:
     """
@@ -44,7 +72,6 @@ def aircraft_vector_from_gps(gps_cartesian: tuple, aircraft_cartesian: tuple) ->
     gps_x, gps_y, gps_z = gps_cartesian
     aircraft_x, aircraft_y, aircraft_z = aircraft_cartesian
 
-
     return (aircraft_x - gps_x, aircraft_y - gps_y, aircraft_z - gps_z)
 
 def aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)->tuple[float, float, float]:
@@ -52,7 +79,7 @@ def aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)->tuple[f
     Get the aircraft vector aligned with longitude and latitude, with z pointing up.
     """
     # Get theta in radians, rotated by 90 degrees
-    theta = deg_to_rad(normalize_longitude(gps_lon))
+    theta = lon_to_theta(gps_lon)
     phi = lat_to_phi(gps_lat)
 
     aircraft_x, aircraft_y, aircraft_z = aircraft_vector
@@ -71,17 +98,34 @@ def azimuth_elevation_from_vector(vector: tuple)->tuple[float, float]:
     x, y, z = vector
 
     theta = math.atan2(y, x)
-    azimuth = (deg_to_rad(450) - theta) % 360
+    azimuth = (deg_to_rad(450) - theta) % 2*math.pi
     
     elevation = math.atan2(z, math.sqrt(x**2 + y**2))
+    print("azimuth and elevation")
+    print(rad_to_deg(azimuth), rad_to_deg(elevation))
+
     return (azimuth, elevation)
 
 def aziele_to_radec(azele: tuple[float, float], gps_lat: float, gps_lon: float, time=None)->tuple[float, float]:
     """
     Convert the azimuth and elevation to right ascension and declination.
     :return: Right Ascension in degrees, Declination in degrees.
+    :raise ValueError: If the latitude or longitude is out of range.
+    :raise ValueError: If the azimuth or elevation is out of range.
     """
+    if (gps_lat > 90 or gps_lat < -90):
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+    if (gps_lon > 180 or gps_lon < -180):
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
+
+    # Get the azimuth and elevation
     azimuth, elevation = azele
+
+    if (azimuth > 2*math.pi or azimuth < 0):
+        raise ValueError("Azimuth must be between 0 and 2pi.")
+    if (elevation > math.pi/2 or elevation < -math.pi/2):
+        raise ValueError("Elevation must be between -pi/2 and pi/2.")
+
 
     lat_rad = deg_to_rad(gps_lat)
 
@@ -105,3 +149,16 @@ def aziele_to_radec(azele: tuple[float, float], gps_lat: float, gps_lon: float, 
     declination = rad_to_deg(declination)
 
     return (right_ascension, declination)
+
+    
+def aircraft_lat_lon_to_radec(aircraft_lat, aircraft_lon, aircraft_alt, gps_lat, gps_lon, gps_alt, time=None)->tuple[float, float]:
+    """
+    Convert the aircraft's latitude and longitude to right ascension and declination.
+    :return: Right Ascension in degrees, Declination in degrees.
+    """
+    gps_cart = gps_cartesian(gps_lat, gps_lon, gps_alt)
+    aircraft_cart = gps_cartesian(aircraft_lat, aircraft_lon, aircraft_alt)
+    aircraft_vector = aircraft_vector_from_gps(gps_cart, aircraft_cart)
+    aircraft_vector_aligned = aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)
+    azele = azimuth_elevation_from_vector(aircraft_vector_aligned)
+    return aziele_to_radec(azele, gps_lat, gps_lon, time)
