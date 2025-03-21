@@ -87,10 +87,11 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
         # add flight if entering/exiting the fov
         if is_intersecting:
-            if flight.id not in flights_in_fov:
+            if flight.id not in flights_in_fov: # enter time
                 flights_in_fov.add(flight.id)
                 flight.entry = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
-            else:
+        else:
+            if flight.id in flights_in_fov: # exit time
                 flights_in_fov.discard(flight.id)
                 flight.exit = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
 
