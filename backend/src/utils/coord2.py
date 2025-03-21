@@ -116,7 +116,7 @@ def convert_lat_lon_to_ra_dec(
     obs_lon,
     obs_alt,
     observer_time=None
-):
+) -> tuple[float, float]:
     # Use the current time if no observer_time is provided.
     if observer_time is None:
         observer_time = Time.now()
@@ -147,7 +147,7 @@ def convert_lat_lon_to_ra_dec(
     # Finally, transform from AltAz to ICRS to obtain RA and Dec.
     obj_icrs = obj_altaz.transform_to(ICRS())
     
-    return (obj_icrs.ra, obj_icrs.dec)
+    return (obj_icrs.ra.deg, obj_icrs.dec.deg)
 
 
 # Example usage:

@@ -45,7 +45,7 @@ def find_flights_in_circ_boundary(lat, lon, radius) -> list[ProcessedFlightInfo]
 if __name__ == "__main__":
     # Example usage
     # Find all flights within a rectangle boundary
-    print(find_flights_in_rect_boundary(-79.42, 43.7, -79.41, 43.71))
+    rect_flights = find_flights_in_rect_boundary(-79.42, 43.7, -79.41, 43.71)
 
     # Find all flights within a circular boundary
-    print(find_flights_in_circ_boundary(43.7, -79.42, 100000)[0].__str__()) # 1000 meters = 1 km
+    circ_flights = find_flights_in_circ_boundary(43.7, -79.42, 100000)[0].__str__(0) # 1000 meters = 1 km
