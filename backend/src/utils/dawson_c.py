@@ -41,7 +41,7 @@ def gps_cartesian(lat, lon, alt)-> tuple[float, float, float]:
     phi = lat_to_phi(lat)
 
     # Get theta in radians, rotated by 90 degrees
-    theta = lon_to_theta(lon) + math.pi/2
+    theta = (lon_to_theta(lon) + math.pi/2) % (2*math.pi)
 
     return spherical_to_cartesian(EARTH_RADIUS_METER + alt, theta, phi)
 
@@ -61,7 +61,7 @@ def aircraft_theta_phi_to_cartesian(theta, phi, alt) -> tuple[float, float, floa
     if (theta > 2 * math.pi or theta < 0):
         raise ValueError("Theta angle must be less than or equal to 2pi.")
         
-    theta = theta + math.pi/2
+    theta = (theta + math.pi/2) % (2*math.pi)
     return spherical_to_cartesian(alt + EARTH_RADIUS_METER, theta, phi)
 
 def aircraft_vector_from_gps(gps_cartesian: tuple, aircraft_cartesian: tuple) -> tuple[float, float, float]:
