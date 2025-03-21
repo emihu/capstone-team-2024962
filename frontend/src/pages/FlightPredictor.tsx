@@ -38,11 +38,6 @@ function FlightPredictor() {
   const [flightData, setFlightData] = useState<any[]>([]);
 
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
-  const [simulatedTime, setSimulatedTime] = useState<any[]>([]);
-  const [simulatedFlightAltitudeUnit, setSimulatedFlightAltitudeUnit] =
-    useState("ft");
-  const [simulatedFlightSpeedUnit, setSimulatedFlightSpeedUnit] =
-    useState("knots");
   const [newFlight, setNewFlight] = useState({
     altitude: "",
     altitudeUnit: "m",
@@ -94,8 +89,7 @@ function FlightPredictor() {
         "http://127.0.0.1:5000/api/flight-prediction",
         {
           ...formData,
-          simulatedFlights,
-          simulatedTime
+          simulatedFlights
         }
       );
 
@@ -128,6 +122,8 @@ function FlightPredictor() {
 
   const addSimulatedFlight = () => {
     if (Object.values(newFlight).some((val) => val === "")) {
+      console.log(Object.values(newFlight));
+
       alert("Error: All fields must be filled out.");
       return;
     }
@@ -167,7 +163,7 @@ function FlightPredictor() {
     const speedValue =
       newFlight.speedUnit === "kph"
         ? parseFloat(newFlight.speed) * 0.539957
-        : simulatedFlightSpeedUnit === "mph"
+        : newFlight.speedUnit === "mph"
         ? parseFloat(newFlight.speed) * 0.868976
         : parseFloat(newFlight.speed);
 
@@ -177,9 +173,9 @@ function FlightPredictor() {
     ]);
     setNewFlight({
       altitude: "",
-      altitudeUnit: "",
+      altitudeUnit: "m",
       speed: "",
-      speedUnit: "",
+      speedUnit: "knots",
       latitude: "",
       longitude: "",
       heading: "",
@@ -605,10 +601,10 @@ function FlightPredictor() {
                   <tr>
                     <th>Flight Number</th>
                     <th>Altitude (feet)</th>
-                    <th>Heading (deg)</th>
+                    <th>Speed (knots)</th>
                     <th>Latitude (deg)</th>
                     <th>Longitude (deg)</th>
-                    <th>Speed (knots)</th>
+                    <th>Heading (deg)</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -617,10 +613,10 @@ function FlightPredictor() {
                     <tr key={index}>
                       <td>{`SIM${index + 1}`}</td>
                       <td>{flight.altitude}</td>
-                      <td>{flight.heading}</td>
+                      <td>{flight.speed}</td>
                       <td>{flight.latitude}</td>
                       <td>{flight.longitude}</td>
-                      <td>{flight.speed}</td>
+                      <td>{flight.heading}</td>
                       <td>
                         <button
                           type="button"
