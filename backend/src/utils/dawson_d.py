@@ -69,6 +69,9 @@ def d2(fov, NN, MM, RA, Dec):
     # calculate distances
     d1 = distance_to_fov_path_1(bb, NN, MM, RA, Dec, gg)
     d2 = distance_to_fov_path_2(bb, NN, MM, RA, Dec, gg)
+    print(f"gg:{gg}")
+    print(f"d1:{d1}")
+    print(f"d2:{d2}")
 
     # find intersection time
     tint1 = intersection_time(d1, ddis)
@@ -115,3 +118,37 @@ def zaaz(NN, MM, RA, Dec):
 
 def d3(NN, MM, RA, Dec):
     ftt = 10 * [xaax(NN, MM, RA), yaay(NN, MM, RA, Dec), zaaz(NN, MM, RA, Dec)]
+
+def angular_distance(ra1, dec1, ra2, dec2):
+    """
+    Calculate the angular distance between two celestial points using the haversine formula.
+    
+    Parameters:
+        ra1 (float): Right Ascension of the first point (in degrees)
+        dec1 (float): Declination of the first point (in degrees)
+        ra2 (float): Right Ascension of the second point (in degrees)
+        dec2 (float): Declination of the second point (in degrees)
+    Raise:
+        ValueError: If ra1, dec1, ra2, or dec2 are out of range
+        
+    Returns:
+        float: Angular distance between the two points (in degrees)
+    """
+    # Check if the coordinates are within the valid range
+    if not (-90 <= dec1 <= 90) or not (-90 <= dec2 <= 90) or not (0 <= ra1 <= 360) or not (0 <= ra2 <= 360):
+        raise ValueError("Coordinates out of range")
+
+    # Convert degrees to radians
+    ra1_rad, dec1_rad = math.radians(ra1), math.radians(dec1)
+    ra2_rad, dec2_rad = math.radians(ra2), math.radians(dec2)
+    
+    # Differences in coordinates
+    delta_ra = ra2_rad - ra1_rad
+    delta_dec = dec2_rad - dec1_rad
+    
+    # Haversine formula
+    a = math.sin(delta_dec / 2)**2 + math.cos(dec1_rad) * math.cos(dec2_rad) * math.sin(delta_ra / 2)**2
+    c = 2 * math.asin(math.sqrt(a))
+    
+    # Convert the result from radians to degrees
+    return math.degrees(c)

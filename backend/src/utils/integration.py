@@ -100,9 +100,3 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
     # add all of the flight positions of flights within the fov at this timestamp
     flights_position.append(curr_flight_positions)
-
-        
-
-
-        
-        
