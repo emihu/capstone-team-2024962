@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import "bootstrap/dist/css/bootstrap.css";
 
 import FlightTable from "../components/TableFlights";
+import FovDisplay from "../components/FovDisplay";
 import "./FlightPredictor.css";
 
 function FlightPredictor() {
@@ -29,6 +30,7 @@ function FlightPredictor() {
       altitude: "",
       altitudeUnit: "m",
       flightDataType: "live",
+      datetime: ""
     },
   });
 
@@ -36,26 +38,56 @@ function FlightPredictor() {
   const [flightData, setFlightData] = useState<any[]>([]);
 
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
+  const [simulatedTime, setSimulatedTime] = useState<any[]>([]);
   const [simulatedFlightAltitudeUnit, setSimulatedFlightAltitudeUnit] =
     useState("ft");
   const [simulatedFlightSpeedUnit, setSimulatedFlightSpeedUnit] =
     useState("knots");
   const [newFlight, setNewFlight] = useState({
     altitude: "",
+    altitudeUnit: "m",
     speed: "",
+    speedUnit: "knots",
     latitude: "",
     longitude: "",
     heading: "",
   });
+  const [exposureTime, setExposureTime] = useState<number>(0);
+  const [fovCenterRA, setfovCenterRA] = useState<number>(0);
+  const [fovCenterDec, setfovCenterDec] = useState<number>(0);
+  const [counter, setCounter] = useState(0);
+  const [visibleFlights, setvisibleFlights] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const flightDataType = watch("flightDataType");
+
+  const remainingTimePercentage =
+    ((exposureTime - counter) / exposureTime) * 100;
+
+  const isFlightDataEmpty = Object.values(flightData).every(
+    (arr) => arr.length === 0
+  );
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCounter((prevCounter) =>
+        prevCounter >= flightsPosition.length - 1 ? 0 : prevCounter + 1
+      );
+    }, 250);
+
+    return () => clearInterval(intervalId);
+  }, [flightsPosition]);
+
+  useEffect(() => {
+    setvisibleFlights(flightsPosition[counter] || []);
+  }, [counter, flightsPosition]);
 
   const fetchFlightData = async (formData: any) => {
     if (flightDataType === "simulated" && simulatedFlights.length === 0) {
       alert("Error: Please add at least one simulated flight.");
       return;
     }
-  
+
     try {
       console.log("Fetching flight data...", formData);
       const response = await axios.post(
@@ -63,26 +95,35 @@ function FlightPredictor() {
         {
           ...formData,
           simulatedFlights,
+          simulatedTime
         }
       );
-  
+
       // Extract the returned data
       const { flights_position, flight_data } = response.data;
-  
+
       // Set the state variables
       setFlightsPosition(flights_position);
       setFlightData(flight_data);
-      
     } catch (error) {
       console.error("Error fetching flight data:", error);
     }
   };
 
   const onSubmit = (formData: any) => {
+    setIsLoading(true);
     if (formData.altitudeUnit === "ft") {
       formData.altitude = (parseFloat(formData.altitude) * 0.3048).toString();
     }
+    setExposureTime(formData.exposure);
+    setfovCenterRA(
+      formData.fovCenterRaH * 15 +
+        (formData.fovCenterRaM * 15) / 60 +
+        (formData.fovCenterRaS * 15) / 3600
+    );
+    setfovCenterDec(formData.fovCenterDec);
     fetchFlightData(formData);
+    setIsLoading(false);
   };
 
   const addSimulatedFlight = () => {
@@ -91,13 +132,40 @@ function FlightPredictor() {
       return;
     }
 
+    // Check if speed is greater or equal to 0
+    if (parseFloat(newFlight.speed) < 0) {
+      alert("Error: Speed must be greater or equal to 0.");
+      return;
+    }
+
+    // Check if latitude is within valid range (-90 to 90)
+    const latitude = parseFloat(newFlight.latitude);
+    if (latitude < -90 || latitude > 90) {
+      alert("Error: Latitude must be between -90 and 90.");
+      return;
+    }
+
+    // Check if longitude is within valid range (-180 to 180)
+    const longitude = parseFloat(newFlight.longitude);
+    if (longitude < -180 || longitude > 180) {
+      alert("Error: Longitude must be between -180 and 180.");
+      return;
+    }
+
+    // Check if heading is within valid range (0 to 360)
+    const heading = parseFloat(newFlight.heading);
+    if (heading < 0 || heading >= 360) {
+      alert("Error: Heading must be between 0 and 360.");
+      return;
+    }
+
     const altitudeValue =
-      simulatedFlightAltitudeUnit === "ft"
+      newFlight.altitudeUnit === "ft"
         ? parseFloat(newFlight.altitude)
         : parseFloat(newFlight.altitude) * 3.28084;
 
     const speedValue =
-      simulatedFlightSpeedUnit === "kph"
+      newFlight.speedUnit === "kph"
         ? parseFloat(newFlight.speed) * 0.539957
         : simulatedFlightSpeedUnit === "mph"
         ? parseFloat(newFlight.speed) * 0.868976
@@ -109,7 +177,9 @@ function FlightPredictor() {
     ]);
     setNewFlight({
       altitude: "",
+      altitudeUnit: "",
       speed: "",
+      speedUnit: "",
       latitude: "",
       longitude: "",
       heading: "",
@@ -125,61 +195,100 @@ function FlightPredictor() {
     <div className="container">
       <h1>Flight Predictor</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-3 pt-2">
-          <label className="form-label">Focal Length</label>
-          <div className="d-flex align-items-center">
+        <br></br>
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">Focal Length</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
               className="form-control w-auto"
-              {...register("focalLength")}
+              {...register("focalLength", {
+                min: {
+                  value: 0,
+                  message: "Focal length must be positive",
+                },
+              })}
             />
-            <span className="ms-2 text-muted">mm</span>
+            <span className="text-muted">mm</span>
           </div>
+          {errors.focalLength && (
+            <div className="text-danger mt-1">{errors.focalLength.message}</div>
+          )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">Camera Sensor Diagonal Dimension</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">
+            Camera Sensor Diagonal Dimension
+          </label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
               className="form-control w-auto"
-              {...register("cameraSensorSize")}
+              {...register("cameraSensorSize", {
+                min: {
+                  value: 0,
+                  message: "Camera sensor size must be positive",
+                },
+              })}
             />
-            <span className="ms-2 text-muted">mm</span>
+            <span className="text-muted">mm</span>
           </div>
+          {errors.cameraSensorSize && (
+            <div className="text-danger mt-1">
+              {errors.cameraSensorSize.message}
+            </div>
+          )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">Barlow/Reducer Factor</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">Barlow/Reducer Factor</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
               className="form-control w-auto"
-              {...register("barlowReducerFactor")}
+              {...register("barlowReducerFactor", {
+                min: {
+                  value: 0,
+                  message: "Barlow/reducer factor must be positive",
+                },
+              })}
             />
-            <span className="ms-2 text-muted">x</span>
+            <span className="text-muted">x</span>
           </div>
+          {errors.barlowReducerFactor && (
+            <div className="text-danger mt-1">
+              {errors.barlowReducerFactor.message}
+            </div>
+          )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">Exposure Time</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">Exposure Time</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
               className="form-control w-auto"
-              {...register("exposure")}
+              {...register("exposure", {
+                min: {
+                  value: 0,
+                  message: "Exposure must be positive",
+                },
+              })}
             />
-            <span className="ms-2 text-muted">secs</span>
+            <span className="text-muted">secs</span>
           </div>
+          {errors.exposure && (
+            <div className="text-danger mt-1">{errors.exposure.message}</div>
+          )}
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">FOV Center - RA</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">FOV Center - RA</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
@@ -195,7 +304,7 @@ function FlightPredictor() {
                 },
               })}
             />
-            <span className="ms-2 text-muted pe-4">hours</span>
+            <span className="text-muted pe-4">hours</span>
             <input
               type="number"
               step="any"
@@ -211,7 +320,7 @@ function FlightPredictor() {
                 },
               })}
             />
-            <span className="ms-2 text-muted pe-4">mins</span>
+            <span className="text-muted pe-4">mins</span>
             <input
               type="number"
               step="any"
@@ -227,7 +336,7 @@ function FlightPredictor() {
                 },
               })}
             />
-            <span className="ms-2 text-muted pe-4">secs</span>
+            <span className="text-muted pe-4">secs</span>
           </div>
           {errors.fovCenterRaH && (
             <div className="text-danger mt-1">
@@ -246,9 +355,9 @@ function FlightPredictor() {
           )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">FOV Center - Dec</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">FOV Center - Dec</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
@@ -264,7 +373,7 @@ function FlightPredictor() {
                 },
               })}
             />
-            <span className="ms-2 text-muted">deg</span>
+            <span className="text-muted">deg</span>
           </div>
           {errors.fovCenterDec && (
             <div className="text-danger mt-1">
@@ -273,9 +382,9 @@ function FlightPredictor() {
           )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">Latitude</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">Latitude</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
@@ -291,16 +400,16 @@ function FlightPredictor() {
                 },
               })}
             />
-            <span className="ms-2 text-muted">deg</span>
+            <span className="text-muted">deg</span>
           </div>
           {errors.latitude && (
             <div className="text-danger mt-1">{errors.latitude.message}</div>
           )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">Longitude</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">Longitude</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
@@ -316,16 +425,16 @@ function FlightPredictor() {
                 },
               })}
             />
-            <span className="ms-2 text-muted">deg</span>
+            <span className="text-muted">deg</span>
           </div>
           {errors.longitude && (
             <div className="text-danger mt-1">{errors.longitude.message}</div>
           )}
         </div>
 
-        <div className="mb-3 pt-2">
-          <label className="form-label">Altitude</label>
-          <div className="d-flex align-items-center">
+        <div className="row mb-3 pt-2">
+          <label className="col-md-3 form-label">Altitude</label>
+          <div className="col-md-6 d-flex align-items-center gap-2">
             <input
               type="number"
               step="any"
@@ -365,11 +474,23 @@ function FlightPredictor() {
         </div>
 
         {flightDataType === "simulated" && (
-          <>
-            <h3>Add Simulated Flight</h3>
-            <div className="mb-3">
-              <label className="form-label">Altitude</label>
-              <div className="d-flex align-items-center">
+          <div className="p-4" style={{ backgroundColor: "#e6e6e6" }}>
+            <div className="row mb-3 pt-2">
+              <label className="col-md-3 form-label">Date and Time</label>
+              <div className="col-md-6 d-flex align-items-center gap-2">
+              <input
+                type="datetime-local"
+                className="form-control w-auto"
+                {...register("datetime")}
+              />
+              </div>
+            </div>
+
+            <h4>Add Simulated Flight</h4>
+
+            <div className="row mb-3 pt-2">
+              <label className="col-md-3 form-label">Altitude</label>
+              <div className="col-md-6 d-flex align-items-center gap-2">
                 <input
                   type="number"
                   step="any"
@@ -379,13 +500,22 @@ function FlightPredictor() {
                     setNewFlight({ ...newFlight, altitude: e.target.value })
                   }
                 />
-                <span className="ms-2 text-muted">m</span>
+                <select
+                  className="form-select w-auto"
+                  value={newFlight.altitudeUnit}
+                  onChange={(e) =>
+                    setNewFlight({ ...newFlight, altitudeUnit: e.target.value })
+                  }
+                >
+                  <option value="m">m</option>
+                  <option value="ft">ft</option>
+                </select>
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Speed</label>
-              <div className="d-flex align-items-center">
+            <div className="row mb-3 pt-2">
+              <label className="col-md-3 form-label">Speed</label>
+              <div className="col-md-6 d-flex align-items-center gap-2">
                 <input
                   type="number"
                   step="any"
@@ -395,13 +525,23 @@ function FlightPredictor() {
                     setNewFlight({ ...newFlight, speed: e.target.value })
                   }
                 />
-                <span className="ms-2 text-muted">kmh</span>
+                <select
+                  className="form-select w-auto"
+                  value={newFlight.speedUnit}
+                  onChange={(e) =>
+                    setNewFlight({ ...newFlight, speedUnit: e.target.value })
+                  }
+                >
+                  <option value="knots">knots</option>
+                  <option value="kph">kph</option>
+                  <option value="mph">mph</option>
+                </select>
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Latitude</label>
-              <div className="d-flex align-items-center">
+            <div className="row mb-3 pt-2">
+              <label className="col-md-3 form-label">Latitude</label>
+              <div className="col-md-6 d-flex align-items-center gap-2">
                 <input
                   type="number"
                   step="any"
@@ -411,13 +551,13 @@ function FlightPredictor() {
                     setNewFlight({ ...newFlight, latitude: e.target.value })
                   }
                 />
-                <span className="ms-2 text-muted">deg</span>
+                <span className="text-muted">deg</span>
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Longitude</label>
-              <div className="d-flex align-items-center">
+            <div className="row mb-3 pt-2">
+              <label className="col-md-3 form-label">Longitude</label>
+              <div className="col-md-6 d-flex align-items-center gap-2">
                 <input
                   type="number"
                   step="any"
@@ -427,13 +567,13 @@ function FlightPredictor() {
                     setNewFlight({ ...newFlight, longitude: e.target.value })
                   }
                 />
-                <span className="ms-2 text-muted">deg</span>
+                <span className="text-muted">deg</span>
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Heading</label>
-              <div className="d-flex align-items-center">
+            <div className="row mb-3 pt-2">
+              <label className="col-md-3 form-label">Heading</label>
+              <div className="col-md-6 d-flex align-items-center gap-2">
                 <input
                   type="number"
                   step="any"
@@ -443,7 +583,7 @@ function FlightPredictor() {
                     setNewFlight({ ...newFlight, heading: e.target.value })
                   }
                 />
-                <span className="ms-2 text-muted">deg</span>
+                <span className="text-muted">deg</span>
               </div>
             </div>
 
@@ -456,7 +596,9 @@ function FlightPredictor() {
                 Add Flight
               </button>
             </div>
-            <h3>Simulated Flights</h3>
+
+            <h4>Simulated Flights</h4>
+            <p>*NOTE: Altitude is converted to feet and speed is converted to knots.</p>
             <div className="table-responsive">
               <table className="table table-striped table-bordered table-light">
                 <thead className="thead-dark">
@@ -493,7 +635,7 @@ function FlightPredictor() {
                 </tbody>
               </table>
             </div>
-          </>
+          </div>
         )}
         <div>
           <button type="submit" className="btn btn-primary">
@@ -502,6 +644,16 @@ function FlightPredictor() {
         </div>
       </form>
       <FlightTable data={flightData} />
+      <FovDisplay
+        isLoading={isLoading}
+        flightData={flightData}
+        isFlightDataEmpty={isFlightDataEmpty}
+        fovCenterRA={fovCenterRA}
+        fovCenterDec={fovCenterDec}
+        visibleFlights={visibleFlights}
+        currentExposureTime={exposureTime}
+        remainingTimePercentage={remainingTimePercentage}
+      />
     </div>
   );
 }

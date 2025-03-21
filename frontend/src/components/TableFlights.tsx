@@ -19,7 +19,7 @@ const TableFlights: React.FC<TableFlightsProps> = ({ data }) => {
   return (
     <>
       {data.length === 0 ? (
-        <p>No flights found</p>
+        <br></br>
       ) : (
         <div>
           <div className="table-responsive">

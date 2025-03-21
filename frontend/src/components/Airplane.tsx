@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/Flights.css"; // Use similar styles as Satellite
+import "./Airplane.css"; // Use similar styles as Satellite
 import flightImage from "../assets/Airplane.png"; // Flight image
 //import TooltipCard from "./toolTipCard";
 
@@ -31,12 +31,12 @@ interface AirplaneProps {
 }
 
 const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
-    const { ID, RA, Dec } = flight;
-    const [isHovered, setIsHovered] = useState(false);
-  
-    // Compute relative position in FOV
-    const delta_RA = RA - fovCenter.RA;  // Difference from FOV center (degrees)
-    const delta_Dec = Dec - fovCenter.Dec;  // Difference from FOV center (degrees)
+  const { ID, RA, Dec } = flight;
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Compute relative position in FOV
+  const delta_RA = RA - fovCenter.RA;  // Difference from FOV center (degrees)
+  const delta_Dec = Dec - fovCenter.Dec;  // Difference from FOV center (degrees)
 
   // Convert RA/Dec offsets into FOV frame coordinates
   const x = delta_RA / 2; // Normalize for display
