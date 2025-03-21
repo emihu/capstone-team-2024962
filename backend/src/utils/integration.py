@@ -83,10 +83,10 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
         
         print(f"RA, Dec: {flight.RA}, {flight.Dec}")
 
-        intersection_check = dawson_d.d2(fov_size, flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"])
+        is_intersecting = dawson_d.angular_distance(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"]) < fov_size
 
         # add flight if entering/exiting the fov
-        if intersection_check:
+        if is_intersecting:
             if flight.id not in flights_in_fov:
                 flights_in_fov.add(flight.id)
                 flight.entry = observer_time.to_datetime() + timedelta(seconds=elapsed_time)

@@ -152,3 +152,24 @@ def angular_distance(ra1, dec1, ra2, dec2):
     
     # Convert the result from radians to degrees
     return math.degrees(c)
+
+    
+def is_intersecting(ra1, dec1, ra2, dec2, fov_size) -> bool:
+    """
+    Check if the line of sight between two celestial points intersects with the field of view.
+    
+    Parameters:
+        ra1 (float): Right Ascension of the first point (in degrees)
+        dec1 (float): Declination of the first point (in degrees)
+        ra2 (float): Right Ascension of the second point (in degrees)
+        dec2 (float): Declination of the second point (in degrees)
+        fov_size (float): Field of view size (in degrees)
+        
+    Returns:
+        bool: True if the line of sight intersects with the field of view, False otherwise
+    """
+    # Calculate the angular distance between the two points
+    angle = angular_distance(ra1, dec1, ra2, dec2)
+    
+    # Check if the angular distance is within the field of view
+    return angle < fov_size
