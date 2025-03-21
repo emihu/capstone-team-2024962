@@ -292,11 +292,11 @@ function FlightPredictor() {
               {...register("fovCenterRaH", {
                 min: {
                   value: 0,
-                  message: "Hour must be greater than or equal to 0",
+                  message: "Hour must be between 0 and 23",
                 },
                 max: {
                   value: 23,
-                  message: "Hour must be less than or equal to 23",
+                  message: "Hour must be between 0 and 23",
                 },
               })}
             />
@@ -308,11 +308,11 @@ function FlightPredictor() {
               {...register("fovCenterRaM", {
                 min: {
                   value: 0,
-                  message: "Minute must be greater than or equal to 0",
+                  message: "Minute must be between 0 and 59",
                 },
                 max: {
                   value: 59,
-                  message: "Minute must be less than or equal to 59",
+                  message: "Minute must be between 0 and 59",
                 },
               })}
             />
@@ -324,11 +324,11 @@ function FlightPredictor() {
               {...register("fovCenterRaS", {
                 min: {
                   value: 0,
-                  message: "Second must be greater than or equal to 0",
+                  message: "Second must be between 0 and 59",
                 },
                 max: {
                   value: 59,
-                  message: "Second must be less than or equal to 59",
+                  message: "Second must be between 0 and 59",
                 },
               })}
             />
@@ -361,11 +361,11 @@ function FlightPredictor() {
               {...register("fovCenterDec", {
                 min: {
                   value: -90,
-                  message: "Declination must be greater than or equal to -90",
+                  message: "Declination must be between -90 and 90",
                 },
                 max: {
                   value: 90,
-                  message: "Declination must be less than or equal to 90",
+                  message: "Declination must be between -90 and 90",
                 },
               })}
             />
@@ -388,11 +388,11 @@ function FlightPredictor() {
               {...register("latitude", {
                 min: {
                   value: -90,
-                  message: "Latitude must be greater than or equal to -90",
+                  message: "Latitude must be between -90 and 90",
                 },
                 max: {
                   value: 90,
-                  message: "Latitude must be less than or equal to 90",
+                  message: "Latitude must be between -90 and 90",
                 },
               })}
             />
@@ -413,11 +413,11 @@ function FlightPredictor() {
               {...register("longitude", {
                 min: {
                   value: -180,
-                  message: "Longitude must be greater than or equal to -180",
+                  message: "Longitude must be between -180 and 180",
                 },
                 max: {
                   value: 180,
-                  message: "Longitude must be less than or equal to 180",
+                  message: "Longitude must be between -180 and 180",
                 },
               })}
             />
