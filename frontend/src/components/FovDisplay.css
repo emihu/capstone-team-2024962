@@ -1,29 +1,41 @@
+.container {
+    justify-content: center;  /* Centers horizontally */
+}
+
 .fov-frame {
     position: relative;
     width: 700px;
     height: 700px;
     border: 1px solid #000000;
-    background-color: rgba(21, 21, 21, 1);
+    background-color: #151515;
     border-radius: 50%;
-    margin-left: 10%;
+    margin-left: 27%;
 }
 
-.fov-title, .pill-title {
+.fov-title {
     color: rgb(0, 0, 0);
     margin-top: 10px;
     font-weight: 600;
-    margin-left: 10%;
+    margin-left: 50%;
+    font-size: large;
+}
+
+.pill-title {
+    color: #4e4e4e;
+    margin-top: 10px;
+    font-weight: 600;
+    margin-left: 50%;
     font-size: large;
 }
 
 
 .exposure-pill-container {
-    width: 100%;
+    width: 900px;
     height: 25px;
-    background-color: #0f2358;
+    background-color: #4e4e4e;
     position: relative;
     margin-top: 10px;
-    margin-left: 10%;
+    margin-left: 19%;
     border-radius: 10px;
 }
 
@@ -32,7 +44,7 @@
     top: 0;
     left: 0;
     bottom: 0;
-    background-color: #612671;
+    background-color: #2e2e2e;
     transition: width 0.3s;
     border-radius: 10px;
 }
@@ -60,63 +72,3 @@
     padding: 10px;
 }
 
-/* Media Queries */
-@media (max-width: 1024px) {
-    .satelliteInter-page {
-        height: auto;
-    }
-
-    .fov-frame {
-        width: 80vw; 
-        margin-left: 10%;
-    }
-}
-
-@media (max-width: 768px) {
-    .satelliteInter-page {
-        height: auto;
-    }
-
-    .main-row-container {
-        flex-direction: column;
-        text-align: center;
-    } 
-
-    .fov-title, .pill-title {
-        margin-left: 0;
-        margin-top: 20px !important;
-        margin-bottom: 10px;
-    }
-
-    .exposure-pill-container {
-        width: auto;
-        margin-left: 0px;
-    }
-
-    .exposure-pill {
-        width: auto;
-    }
-
-    .fov-frame {
-        width: calc(100%);
-        height: calc(100vw - 50px);
-        margin-left: 0;
-    }
-
-    .search {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .search-button {
-        margin-top: 20px;
-        width: 80% !important;
-    }
-
-    .row {
-        width: auto;
-        margin-left: 0px;
-        margin-right: 0px;
-    }
-}
