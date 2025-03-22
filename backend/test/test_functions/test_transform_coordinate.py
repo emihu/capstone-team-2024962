@@ -25,14 +25,14 @@ def test_lat_lon_to_ra_dec():
     vector = dawson_c.aircraft_vector_from_gps(
         user_gps_cartesian, aircraft_gps_cartesian)
 
-    print(vector)
     vector = dawson_c.aircraft_vector_from_gps_aligned(vector, user_lat, user_lon)
-    print(vector)
 
     azele = dawson_c.azimuth_elevation_from_vector(vector)
 
     ra, dec = dawson_c.aziele_to_radec(azele, user_lat, user_lon, time)
-    print(ra, dec)
+    returned_ra, returned_dec = dawson_c.aircraft_theta_phi_to_radec(theta, phi, alt, user_lat, user_lon, 0, time)
+    assert ra == returned_ra
+    assert dec == returned_dec
 
 
 

@@ -101,8 +101,6 @@ def azimuth_elevation_from_vector(vector: tuple)->tuple[float, float]:
     azimuth = (deg_to_rad(450) - theta) % 2*math.pi
     
     elevation = math.atan2(z, math.sqrt(x**2 + y**2))
-    print("azimuth and elevation")
-    print(rad_to_deg(azimuth), rad_to_deg(elevation))
 
     return (azimuth, elevation)
 
@@ -151,13 +149,25 @@ def aziele_to_radec(azele: tuple[float, float], gps_lat: float, gps_lon: float, 
     return (right_ascension, declination)
 
     
-def aircraft_lat_lon_to_radec(aircraft_lat, aircraft_lon, aircraft_alt, gps_lat, gps_lon, gps_alt, time=None)->tuple[float, float]:
+def aircraft_theta_phi_to_radec(aircraft_theta, aircraft_phi, aircraft_alt, gps_lat, gps_lon, gps_alt, time=None)->tuple[float, float]:
     """
     Convert the aircraft's latitude and longitude to right ascension and declination.
+    :param aircraft_theta: The theta angle in radians.
+    :param aircraft_phi: The phi angle in radians.
+    :param aircraft_alt: The altitude of the aircraft in meters.
+    :param gps_lat: The latitude of the GPS location in degrees.
+    :param gps_lon: The longitude of the GPS location in degrees.
+    :param gps_alt: The altitude of the GPS location in meters.
+    :param time: The time of observation.
     :return: Right Ascension in degrees, Declination in degrees.
+
+    The following exceptions are raised from the called functions:
+    :raise ValueError: If the latitude or longitude is out of range.
+    :raise ValueError: If the azimuth or elevation is out of range.
+    :raise ValueError: If phi is not in the range of [0, pi] or theta is not in the range of [0, 2pi].
     """
     gps_cart = gps_cartesian(gps_lat, gps_lon, gps_alt)
-    aircraft_cart = gps_cartesian(aircraft_lat, aircraft_lon, aircraft_alt)
+    aircraft_cart = aircraft_theta_phi_to_cartesian(aircraft_theta, aircraft_phi, aircraft_alt)
     aircraft_vector = aircraft_vector_from_gps(gps_cart, aircraft_cart)
     aircraft_vector_aligned = aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)
     azele = azimuth_elevation_from_vector(aircraft_vector_aligned)

@@ -1,7 +1,12 @@
 import uuid
 from datetime import datetime
+from dataclasses import dataclass
 
 class ProcessedFlightInfo:
+    """
+    ProcessedFlightInfo class to represent a flight with processed
+    information.
+    """
     def __init__(self, id: uuid.UUID, flightNumber: int, latitude: float, 
                  longitude: float, altitude: float, speed: float, heading: float):
         self.id = id
@@ -19,4 +24,29 @@ class ProcessedFlightInfo:
 
     def __str__(self):
         return f"{self.id} {self.flightNumber} {self.latitude} {self.longitude} {self.altitude} {self.speed} {self.heading}"
+
+@dataclass
+class HMS:
+    """
+    HMS class to represent an angle in hours, minutes, and seconds.
+    """
+    hours: int
+    minutes: int
+    seconds: float
+
+    def __post_init__(self):
+        if not (0 <= self.hours < 24):
+            raise ValueError("Hours must be in the range 0-23.")
+        if not (0 <= self.minutes < 60):
+            raise ValueError("Minutes must be in the range 0-59.")
+        if not (0 <= self.seconds < 60):
+            raise ValueError("Seconds must be in the range 0-59.")
+
+    def to_degrees(self):
+        """
+        Convert the HMS angle to degrees.
+        (1 hour = 15 degrees)
+        """
+        deg = (self.hours + self.minutes / 60.0 + self.seconds / 3600.0) * 15.0
+        return deg
         
