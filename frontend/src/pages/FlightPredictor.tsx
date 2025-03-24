@@ -36,7 +36,6 @@ function FlightPredictor() {
 
   const [flightsPosition, setFlightsPosition] = useState<any[]>([]);
   const [flightData, setFlightData] = useState<any[]>([]);
-
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
   const [newFlight, setNewFlight] = useState({
     altitude: "",
@@ -57,9 +56,9 @@ function FlightPredictor() {
   const flightDataType = watch("flightDataType");
 
   const remainingTimePercentage =
-    ((exposureTime - counter) / exposureTime) * 100;
+    ((exposureTime - (counter*5)) / exposureTime) * 100;
 
-  const isFlightDataEmpty = Object.values(flightData).every(
+  const isFlightDataEmpty = Object.values(flightsPosition).every(
     (arr) => arr.length === 0
   );
 
@@ -68,7 +67,7 @@ function FlightPredictor() {
       setCounter((prevCounter) =>
         prevCounter >= flightsPosition.length - 1 ? 0 : prevCounter + 1
       );
-    }, 250);
+    }, 500);
 
     return () => clearInterval(intervalId);
   }, [flightsPosition]);
@@ -99,6 +98,8 @@ function FlightPredictor() {
       // Set the state variables
       setFlightsPosition(flights_position);
       setFlightData(flight_data);
+      console.log(flights_position);
+      console.log(flight_data);
     } catch (error) {
       console.error("Error fetching flight data:", error);
     }

@@ -23,15 +23,17 @@ interface AirplaneProps {
       ID: string;  // Flight ID (can be a string or number)
       RA: number;  // Right Ascension in degrees
       Dec: number; // Declination in degrees
+      Heading: number;
     };
     fovCenter: {
       RA: number;  // FOV Center Right Ascension
       Dec: number; // FOV Center Declination
+      Size: number;
     };
 }
 
 const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
-  const { ID, RA, Dec } = flight;
+  const { ID, RA, Dec, Heading } = flight;
   const [isHovered, setIsHovered] = useState(false);
 
   // Compute relative position in FOV
@@ -39,14 +41,14 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
   const delta_Dec = Dec - fovCenter.Dec;  // Difference from FOV center (degrees)
 
   // Convert RA/Dec offsets into FOV frame coordinates
-  const x = delta_RA / 2; // Normalize for display
-  const y = delta_Dec / 2; // Normalize for display
+  const x = delta_RA / fovCenter.Size; // Normalize for display
+  const y = delta_Dec / fovCenter.Size; // Normalize for display
 
   // Convert to CSS positioning
-  const right = 0.5 - x / 2 - 0.056;
+  const right = 0.5 - x / 2;
   const rightPercentage = `${right * 100}%`;
 
-  const top = 0.5 - y / 2 - 0.056;
+  const top = 0.5 - y / 2;
   const topPercentage = `${top * 100}%`;
 
   return (
@@ -58,9 +60,10 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
         position: "absolute",
         top: topPercentage,
         right: rightPercentage,
+        transform: "translate(50%, -50%)"
       }}
     >
-      <img src={flightImage} alt={`Flight ${ID}`} className="airplane-image" />
+      <img src={flightImage} alt={`Flight ${ID}`} className="airplane-image" style={{ transform: `rotate(${Heading}deg)` }}/>
       {/* {isHovered && <TooltipCard id={ID} />} */}
     </div>
   );

@@ -35,39 +35,32 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
             </Alert>
           </Row>
         )}
-        {!isLoading &&
-          Object.values(flightData).map((satelliteDataForSecond, index) => {
-            if (isFlightDataEmpty) {
-              return (
-                <Row className="message-box mt-3" key={`empty-${index}`}>
-                  <Alert variant="info" className="message">
-                    No airplane interference found.
-                  </Alert>
-                </Row>
-              );
-            }
-            return null;
-          })}
-        {/* Render currently visible satellites */}
+        {!isLoading && isFlightDataEmpty && (
+          <Row className="message-box mt-3">
+            <Alert variant="info" className="message">
+              No airplane interference found.
+            </Alert>
+          </Row>
+        )}
         {!isLoading &&
           visibleFlights.map((flight: any, index: number) => (
             <Airplane
               key={index}
               flight={flight}
-              fovCenter={{ RA: fovCenterRA, Dec: fovCenterDec }}
+              fovCenter={{ RA: fovCenterRA, Dec: fovCenterDec, Size: 3 }}
             />
           ))}
       </div>
       {/* Exposure time pill */}
       {!isLoading && (
         <>
-        <div className="pill-title">Next {currentExposureTime} seconds</div>
-        <div className="exposure-pill-container">
-          <div
-            className="exposure-pill"
-            style={{ width: `${remainingTimePercentage}%` }}
-          ></div>
-        </div>
+          <div className="pill-title">Next {currentExposureTime} seconds</div>
+          <div className="exposure-pill-container">
+            <div
+              className="exposure-pill"
+              style={{ width: `${remainingTimePercentage}%` }}
+            ></div>
+          </div>
         </>
       )}
     </div>
