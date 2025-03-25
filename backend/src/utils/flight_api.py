@@ -4,7 +4,7 @@
 ## Note: Coordinates are in the format (latitude, longitude). Latitude is y, longitude is x. Positive is east/north, negative is west/south. E.g. Toronto's coordinates are (43.7, -79.42).
 
 from FlightRadar24 import FlightRadar24API
-from datatypes import ProcessedFlightInfo
+from src.utils.datatypes import ProcessedFlightInfo
 import uuid
 
 # Given a list of flight objects obtained from calling the FR24 API, 

@@ -1,24 +1,49 @@
 
-import math
-from datatypes import ProcessedFlightInfo
+from src.utils.datatypes import ProcessedFlightInfo, HMS
 from astropy.time import Time, TimeDelta
-import dawson_b3
-import dawson_c
-import dawson_d
-import coord 
-import fov
-from constants import EARTH_RADIUS_METER
-from coord2 import convert_lat_lon_to_ra_dec
-from datetime import timedelta, datetime
-from collections import deque
+import src.utils.dawson_b3 as dawson_b3
+import src.utils.dawson_c as dawson_c
+import src.utils.dawson_d as dawson_d
+import src.utils.fov as fov
+from src.utils.constants import EARTH_RADIUS_METER
+
+from datetime import datetime
 # todo: create data class
+#TODO: HMS should directly be input to this class to get type checkings
 def find_flights_intersecting (focal_length: float, camera_sensor_size: float, barlow_reducer_factor: float, exposure: float, 
-                               fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float, 
+                               fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float,
                                observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time: datetime | None = None):
+    """
+    Function to find flights intersecting the field of view of the telescope.
+    :param focal_length: The focal length of the telescope.
+    :param camera_sensor_size: The size of the camera sensor.
+    :param barlow_reducer_factor: The barlow reducer factor.
+    :param exposure: The exposure time.
+    :param fov_center_ra_h: The Right Ascension of the center of the field of view in hours.
+    :param fov_center_ra_m: The Right Ascension of the center of the field of view in minutes.
+    :param fov_center_ra_s: The Right Ascension of the center of the field of view in seconds.
+    :param fov_center_dec: The Declination of the center of the field of view.
+    :param observer_lon: The observer's longitude.
+    :param observer_lat: The observer's latitude.
+    :param altitude: The observer's altitude.
+    :param flight_data_type: The type of flight data (live or simulated).
+    :param simulated_flights: The simulated flights.
+    :param simulated_time: The simulated time.
+    :return: The list of flight positions and the flight data.
+    :raise ValueError: If the input values are invalid.
+    """
+    # check input values
+    if observer_lat < -90 or observer_lat > 90:
+        raise ValueError("Observer latitude must be in the range [-90, 90].")
+    if observer_lon < -180 or observer_lon > 180:
+        raise ValueError("Observer longitude must be in the range [-180, 180].")
+    if fov_center_dec < -90 or fov_center_dec > 90:
+        raise ValueError("FOV center declination must be in the range [-90, 90].")
+    if flight_data_type == "simulated" and simulated_flights is None:
+        raise ValueError("Simulated flights must be provided")
     
     # get fov
     fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
-    fov_center_lat, fov_center_lon = coord.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms")
 
     # get horizon
     if flight_data_type == "live":
@@ -28,8 +53,11 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
 
     user_gps = {"latitude": observer_lat, "longitude": observer_lon}
-    fov_center_ra = coord.HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s) 
+    # the ra already have type checkings
+    fov_center_ra = HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s) 
     fov_center = {"RA": fov_center_ra.to_degrees(), "Dec": fov_center_dec} 
+    print(f"FOV center: {fov_center["RA"]} {fov_center["Dec"]}")
+    print(f"FOV size: {fov_size}")
     observer_time = Time.now()
 
     # loop through flights to check for intersections
@@ -43,57 +71,60 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     return flights_position, flight_data
 
 
+# helper function to convert flight's lat, lon, alt to RA, Dec
+def convert_flight_lat_lon_to_ra_dec(flight: ProcessedFlightInfo, updated_observer_time: Time, elapsed_time: int, user_gps: dict[str, float]) -> tuple[float, float]:
+    """
+        Convert the flight's latitude, longitude, altitude to Right Ascension and Declination.
+        :param flight: The flight to convert.
+        :param updated_observer_time: The updated observer time.
+        :param elapsed_time: The elapsed time.
+        :param user_gps: The user's GPS coordinates.
+        :return: The flight's Right Ascension and Declination.
+        :raise ValueError: If the observer time is not provided.
+    """
+    if updated_observer_time is None:
+        raise ValueError("updated observer time must be provided.")
+
+    flight_speed: float = flight.speed * 0.514444 # convert speed from knots to m/s
+    flight_alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
+
+    phi: float = dawson_b3.phi_current_position(
+        flight_speed, EARTH_RADIUS_METER, flight_alt, flight.heading, elapsed_time, flight.latitude)
+    theta: float = dawson_b3.theta_current_position(
+        flight_speed, EARTH_RADIUS_METER, flight_alt, flight.heading, elapsed_time, flight.latitude, flight.longitude)
+
+    # TODO: get user altitude from frontend
+    return dawson_c.aircraft_theta_phi_to_radec(
+        theta, phi, flight_alt, user_gps["latitude"], user_gps["longitude"], 0, updated_observer_time)
+
+    
+
 def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[str, float], observer_time: Time | None, \
                        elapsed_time: int, fov_size: float, fov_center: dict[str, float], flights_in_fov: set, flights_position: list):
     if observer_time is None:
         observer_time = Time.now()
+    #calculate the updated time after the elapsed time
+    delta = TimeDelta(elapsed_time, format='sec')
+    updated_time = observer_time + delta
 
     curr_flight_positions = list()
         
-
     for flight in flight_data:
 
-        speed: float = flight.speed * 0.514444 # convert speed from knots to m/s
-
-        phi: float = dawson_b3.phi_current_position(
-            speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude)
-        theta: float = dawson_b3.theta_current_position(
-            speed, EARTH_RADIUS_METER, flight.altitude, flight.heading, elapsed_time, flight.latitude, flight.longitude)
-
-        lat: float = dawson_b3.phi_to_lat(phi)
-        lon: float = dawson_b3.theta_to_lon(theta)
-        alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
-
-        # TODO: check if this is the correct way to calculate the observer time
-        # TODO: test the timezone
-        delta = TimeDelta(elapsed_time, format='sec')
-        observer_time = observer_time + delta
-
-        print(f"lat, lon: {lat}, {lon}")
-
-        # TODO: get user altitude from frontend
-        flight.RA, flight.Dec = convert_lat_lon_to_ra_dec(
-            sky_obj_lat=lat,
-            sky_obj_lon=lon,
-            sky_obj_alt=alt,
-            obs_lat=user_gps["latitude"],
-            obs_lon=user_gps["longitude"],
-            obs_alt=0,
-            observer_time=observer_time)
+        flight.RA, flight.Dec = convert_flight_lat_lon_to_ra_dec(flight, updated_time, elapsed_time, user_gps)
+        print(flight.RA, flight.Dec)
         
-        print(f"RA, Dec: {flight.RA}, {flight.Dec}")
-
         is_intersecting = dawson_d.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
 
         # add flight if entering/exiting the fov
         if is_intersecting:
             if flight.id not in flights_in_fov: # enter time
                 flights_in_fov.add(flight.id)
-                flight.entry = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
+                flight.entry = updated_time.to_datetime()
         else:
             if flight.id in flights_in_fov: # exit time
                 flights_in_fov.discard(flight.id)
-                flight.exit = observer_time.to_datetime() + timedelta(seconds=elapsed_time)
+                flight.exit = updated_time.to_datetime()
 
         # add position of the flight if in fov
         if flight.id in flights_in_fov:

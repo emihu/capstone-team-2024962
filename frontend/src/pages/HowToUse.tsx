@@ -1,75 +1,63 @@
 import React from "react";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import { FaSearch, FaTable, FaMapMarkedAlt, FaCog, FaLightbulb } from "react-icons/fa";
+import "./HowToUse.css";
 
 function HowToUse() {
   return (
-    <div className="container mt-4">
-      <h1>How to Use the Flight Predictor</h1>
-      <p>
-        The Flight Predictor tool is designed to help you identify potential
-        flight interferences with your field of view (FOV). Follow these simple
-        steps to get started:
-      </p>
-      <h2>Step 1: Enter Your Parameters</h2>
-      <p>Use the input fields to provide details about your setup:</p>
-      <ul>
-        <li>
-          <strong>Focal Length:</strong> The focal length of your telescope or
-          camera lens in millimeters.
-        </li>
-        <li>
-          <strong>Camera Sensor Size:</strong> The size of your camera sensor in
-          millimeters.
-        </li>
-        <li>
-          <strong>Barlow/Reducer Factor:</strong> Any magnification or reduction
-          factor applied by additional optics.
-        </li>
-        <li>
-          <strong>Exposure Time:</strong> The duration of your observation in
-          seconds.
-        </li>
-        <li>
-          <strong>FOV Center (RA/Dec):</strong> The right ascension (RA) and
-          declination (Dec) of the center of your FOV.
-        </li>
-      </ul>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={8}>
+          <Card className="p-4 shadow-sm border-0 bg-light">
+            <h2 className="text-center mb-4 navy">How to Use</h2>
 
-      <h2>Step 2: Submit the Data</h2>
-      <p>
-        Click the <strong>Submit</strong> button to process your input and
-        predict flight interferences. The application will calculate the field
-        of view and display relevant flight paths within your defined area.
-      </p>
+            <h4 className="mt-4 navy">
+              Step 1: Enter your parameters
+            </h4>
+            <p>Provide details about your telescope and observation setup:</p>
+            <ul>
+              <li><strong>Focal Length:</strong> Telescope or camera lens focal length [mm].</li>
+              <li><strong>Camera Sensor Size:</strong> Sensor dimensions [mm].</li>
+              <li><strong>Barlow/Reducer Factor:</strong> Magnification or reduction factor applied.</li>
+              <li><strong>Exposure Time:</strong> Duration of your observation [seconds].</li>
+              <li><strong>FOV Center RA:</strong> Right Ascension (RA) of your telescope's field of view (FOV) center [hours, minutes, seconds].</li>
+              <li><strong>FOV Center Dec:</strong> Declination (Dec) of your telescope's FOV center [degrees].</li>
+              <li><strong>Latitude:</strong> Latitude of the observer [degrees].</li>
+              <li><strong>Longitude:</strong> Longitude of the observer [degrees].</li>
+              <li><strong>Altitude:</strong> Altitude of the observer [degrees].</li>
+            </ul>
+            <p>Note: values can be in decimal format.</p>
 
-      <h2>Step 3: View the Results</h2>
-      <p>The results will include:</p>
-      <ul>
-        <li>
-          A table displaying flight information, such as altitude, speed, and
-          coordinates.
-        </li>
-        <li>An interactive map plotting flight paths and your FOV boundary.</li>
-      </ul>
+            <h4 className="mt-4 navy">
+              Step 2: Choose between live and simulated data
+            </h4>
+            <p>
+              Select either <strong>Live Data</strong> or <strong>Simulated Data</strong> as the flight data source.
+              Live data will use real-time flight data from the FlightRadar24 API. 
+              While, simulated data will allow you to manually input flight data including its altitiude, speed, latitude, longitude, and heading.
+              Multiple simulated flights are supported and you can delete any unwanted flights.
+            </p>
 
-      <h2>Step 4: Customize the FOV</h2>
-      <p>
-        Use the map to explore and visualize the field of view. You can adjust
-        the input parameters and resubmit to refine the results.
-      </p>
+            <h4 className="mt-4 navy">
+              Step 3: Submit your data
+            </h4>
+            <p>
+              Click the <strong>Submit</strong> button to process your input. SkyClear will analyze real-time flight 
+              data or use the customized simulated flight data to identify potential interferences.
+            </p>
 
-      <h2>Tips</h2>
-      <ul>
-        <li>Ensure all input values are accurate for the best results.</li>
-        <li>
-          Use the interactive map to better understand flight positions and
-          movements.
-        </li>
-        <li>
-          Contact support if you encounter any issues or have additional feature
-          requests.
-        </li>
-      </ul>
-    </div>
+            <h4 className="mt-4 navy">
+              Step 4: View the results
+            </h4>
+            <p>Information on any flight path intersections with the telescope's FOV will be displayed in the following formats:</p>
+            <ul>
+              <li>A table displaying flight details (altitude, speed, heading, intersection time, etc).</li>
+              <li>A visualization plotting any flight path intersections within your telescope's FOV over the next exposure period.</li>
+            </ul>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
