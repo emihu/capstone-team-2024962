@@ -42,4 +42,4 @@ def unconvert_longitude(lon) -> float:
     """
     Unconvert the longitude to be in the range of (-180, 180]
     """
-    return lon if lon <= 180 else lon - 360;
+    return lon if lon <= 180 else lon - 360

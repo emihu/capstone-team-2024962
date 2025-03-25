@@ -7,13 +7,34 @@ def deg_to_rad(deg) -> float:
     """
     Convert degrees to radians.
     """
-    return deg * math.pi / 180
+    angle =  deg * math.pi / 180
+    return angle
 
 def rad_to_deg(rad) -> float:
     """
     Convert radians to degrees.
     """
     return rad * 180 / math.pi 
+
+def lat_to_phi(lat) -> float:
+    """
+    Convert latitude to phi angle.
+    lat: The latitude in degrees.
+    return: The angle in radians.
+    """
+    if (lat > 90 or lat < -90):
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+    return math.pi / 2 - deg_to_rad(lat)
+
+def lon_to_theta(lon) -> float:
+    """
+    Convert longitude to theta angle.
+    lon: The longitude in degrees.
+    return: The angle in radians.
+    """
+    if (lon > 180 or lon < -180):
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
+    return deg_to_rad(normalize_longitude(lon))
 
 def phi_to_lat(phi) -> float:
     """
@@ -39,7 +60,9 @@ def normalize_longitude(lon) -> float:
     """
     Normalize the longitude to be in the range of [0, 360).
     """
-    return (lon + 360) % 360
+    if lon < 0:
+        return lon + 360
+    return lon
 
 def unconvert_longitude(lon) -> float:
     """

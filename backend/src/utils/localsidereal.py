@@ -13,7 +13,7 @@ import src.utils.coord as coord
 myLat = 43.665417
 myLon = -79.387198
 
-def get_local_sidereal_time(lat, lon, time = None):
+def get_local_sidereal_time(lat: float, lon: float, time: datetime = None) -> float:
     """
     Get the local sidereal time at a given gps location
     :param lat: latitude
@@ -30,7 +30,7 @@ def get_local_sidereal_time(lat, lon, time = None):
         time = tz_target.localize(today)
 
     # step 2: get the LST
-    observing_location = EarthLocation(lat=myLat*u.deg, lon=myLon*u.deg)
+    observing_location = EarthLocation(lat=lat*u.deg, lon=lon*u.deg)
     observing_time = Time(time, scale='utc', location=observing_location)
     LST = observing_time.sidereal_time('mean')
     return LST.rad

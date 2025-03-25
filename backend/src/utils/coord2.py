@@ -3,9 +3,8 @@ from astropy.time import Time
 from astropy import units as u
 from astropy.coordinates import EarthLocation, ICRS, AltAz, ITRS, SkyCoord, Longitude, Latitude
 from dataclasses import dataclass
-import dawson_b3
-import dawson_c
-from constants import EARTH_RADIUS_METER
+import src.utils.dawson_b3
+from src.utils.constants import EARTH_RADIUS_METER
 
 @dataclass
 class HMS:
@@ -130,19 +129,35 @@ def convert_lat_lon_to_ra_dec(
                                     lon=sky_obj_lon * u.deg,
                                     height=sky_obj_alt * u.m)
     
+    print(observer_location)
+    print(object_location)
+
     # Get the ITRS coordinates for both the object and observer.
     itrs_obj = object_location.get_itrs(obstime=observer_time)
     itrs_obs = observer_location.get_itrs(obstime=observer_time)
+
+    print("Flight and user ITRS coordinates:")
+    print(itrs_obj)
+    print(itrs_obs)
     
     # Compute the topocentric vector: the object's position relative to the observer.
     topo_vector = itrs_obj.cartesian - itrs_obs.cartesian
+
+    print("Topocentric vector:")
+    print(topo_vector)
     
     # Create a SkyCoord from the topocentric vector in the ITRS frame.
     topo_coord = SkyCoord(topo_vector, frame=ITRS(obstime=observer_time))
+
+    print("Topocentric coordinates:")
+    print(topo_coord)
     
     # Transform the topocentric coordinate into the AltAz frame.
     altaz_frame = AltAz(obstime=observer_time, location=observer_location)
     obj_altaz = topo_coord.transform_to(altaz_frame)
+
+    print("AltAz coordinates:")
+    print(obj_altaz)
     
     # Finally, transform from AltAz to ICRS to obtain RA and Dec.
     obj_icrs = obj_altaz.transform_to(ICRS())
