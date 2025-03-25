@@ -1,11 +1,12 @@
 
-from datatypes import ProcessedFlightInfo, HMS
+from src.utils.datatypes import ProcessedFlightInfo, HMS
 from astropy.time import Time, TimeDelta
-import dawson_b3
-import dawson_c
-import dawson_d
-import fov
-from constants import EARTH_RADIUS_METER
+import src.utils.dawson_b3 as dawson_b3
+import src.utils.dawson_c as dawson_c
+import src.utils.dawson_d as dawson_d
+import src.utils.fov as fov
+from src.utils.constants import EARTH_RADIUS_METER
+
 from datetime import datetime
 # todo: create data class
 #TODO: HMS should directly be input to this class to get type checkings
@@ -31,7 +32,6 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     :return: The list of flight positions and the flight data.
     :raise ValueError: If the input values are invalid.
     """
-
     # check input values
     if observer_lat < -90 or observer_lat > 90:
         raise ValueError("Observer latitude must be in the range [-90, 90].")
@@ -56,6 +56,8 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     # the ra already have type checkings
     fov_center_ra = HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s) 
     fov_center = {"RA": fov_center_ra.to_degrees(), "Dec": fov_center_dec} 
+    print(f"FOV center: {fov_center["RA"]} {fov_center["Dec"]}")
+    print(f"FOV size: {fov_size}")
     observer_time = Time.now()
 
     # loop through flights to check for intersections
@@ -110,6 +112,7 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
     for flight in flight_data:
 
         flight.RA, flight.Dec = convert_flight_lat_lon_to_ra_dec(flight, updated_time, elapsed_time, user_gps)
+        print(flight.RA, flight.Dec)
         
         is_intersecting = dawson_d.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
 

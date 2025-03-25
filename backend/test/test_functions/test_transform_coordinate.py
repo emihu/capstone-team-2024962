@@ -14,7 +14,7 @@ def test_lat_lon_to_ra_dec():
     phi = dawson_b.lat_to_phi(lat)
     
     user_lat = 37.7749
-    user_lon = -122.4194
+    user_lon = 47.4194
     time = Time(datetime(2020, 3, 13, 12, 34, 24, tzinfo=timezone.utc))
 
     user_gps_cartesian = dawson_c.gps_cartesian(user_lat, user_lon, 0)
@@ -31,6 +31,7 @@ def test_lat_lon_to_ra_dec():
 
     ra, dec = dawson_c.aziele_to_radec(azele, user_lat, user_lon, time)
     returned_ra, returned_dec = dawson_c.aircraft_theta_phi_to_radec(theta, phi, alt, user_lat, user_lon, 0, time)
+    print(ra, dec)
     assert ra == returned_ra
     assert dec == returned_dec
 
