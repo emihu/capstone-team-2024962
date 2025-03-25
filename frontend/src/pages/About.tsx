@@ -70,7 +70,13 @@ function About() {
             <p>
               Have questions or suggestions? Reach out to us at{" "}
               <a href="mailto:emilyy.hu@mail.utoronto.ca">
-                emilyy.hu@mail.utoronto.ca
+                emilyy.hu@mail.utoronto.ca, 
+              </a>
+              <a href="mailto:l.fan@mail.utoronto.ca">
+              l.fan@mail.utoronto.ca, 
+              </a>
+              <a href="mailto:andrewchapman.leung@mail.utoronto.ca">
+                andrewchapman.leung@mail.utoronto.ca
               </a>
             </p>
           </Card>

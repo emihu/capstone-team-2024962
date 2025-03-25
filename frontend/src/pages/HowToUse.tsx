@@ -26,6 +26,7 @@ function HowToUse() {
               <li><strong>Longitude:</strong> Longitude of the observer [degrees].</li>
               <li><strong>Altitude:</strong> Altitude of the observer [degrees].</li>
             </ul>
+            <p>Note: values can be in decimal format.</p>
 
             <h4 className="mt-4 navy">
               Step 2: Choose between live and simulated data
