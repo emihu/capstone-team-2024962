@@ -1,11 +1,11 @@
 
-from src.utils.datatypes import ProcessedFlightInfo, HMS
+from utils.datatypes import ProcessedFlightInfo, HMS
 from astropy.time import Time, TimeDelta
-import src.utils.dawson_b3 as dawson_b3
-import src.utils.dawson_c as dawson_c
-import src.utils.dawson_d as dawson_d
-import src.utils.fov as fov
-from src.utils.constants import EARTH_RADIUS_METER
+import utils.dawson_b3 as dawson_b3
+import utils.dawson_c as dawson_c
+import utils.dawson_d as dawson_d
+import utils.fov as fov
+from utils.constants import EARTH_RADIUS_METER
 
 from datetime import datetime
 # todo: create data class
@@ -44,6 +44,7 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     
     # get fov
     fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
+    print("fov size: ", fov_size)
 
     # get horizon
     if flight_data_type == "live":
@@ -52,22 +53,22 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
         #TODO: check return type of flight_data, don't see anywhere that converts it to a list of ProcessedFlightInfo
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
 
+    print("flight_data", flight_data)
     user_gps = {"latitude": observer_lat, "longitude": observer_lon}
     # the ra already have type checkings
     fov_center_ra = HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s) 
     fov_center = {"RA": fov_center_ra.to_degrees(), "Dec": fov_center_dec} 
-    print(f"FOV center: {fov_center["RA"]} {fov_center["Dec"]}")
-    print(f"FOV size: {fov_size}")
-    observer_time = Time.now()
 
     # loop through flights to check for intersections
     flights_in_fov = set()
     flights_position = list()
+
     #TODO: play around with the timestep
     observer_time = None if simulated_time is None else simulated_time
-    for elapsed_time in range(0, exposure, 5): 
+    for elapsed_time in range(0, int(exposure), 5): 
         check_intersection(flight_data, user_gps, observer_time, elapsed_time, fov_size, fov_center, flights_in_fov, flights_position)    
 
+    print("done:", flights_position, flight_data)
     return flights_position, flight_data
 
 
@@ -128,7 +129,7 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
         # add position of the flight if in fov
         if flight.id in flights_in_fov:
-            curr_flight_positions.append({"ID": flight.id, "RA": flight.RA, "Dec": flight.Dec})
+            curr_flight_positions.append({"ID": flight.id, "RA": flight.RA, "Dec": flight.Dec, "Heading": flight.heading})
 
     # add all of the flight positions of flights within the fov at this timestamp
     flights_position.append(curr_flight_positions)

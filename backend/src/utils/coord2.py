@@ -3,8 +3,8 @@ from astropy.time import Time
 from astropy import units as u
 from astropy.coordinates import EarthLocation, ICRS, AltAz, ITRS, SkyCoord, Longitude, Latitude
 from dataclasses import dataclass
-import src.utils.dawson_b3
-from src.utils.constants import EARTH_RADIUS_METER
+import utils.dawson_b3
+from utils.constants import EARTH_RADIUS_METER
 
 @dataclass
 class HMS:

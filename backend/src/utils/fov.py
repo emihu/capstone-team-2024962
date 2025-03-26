@@ -1,9 +1,9 @@
 import math
-import src.utils.flight_api as fa
-import src.utils.coord2 as co
-from src.utils.datatypes import ProcessedFlightInfo
+import utils.flight_api as fa
+import utils.coord2 as co
+from utils.datatypes import ProcessedFlightInfo
 import uuid
-from src.utils.constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT
+from utils.constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT
 
 def calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor):
     # calculate the FOV size
@@ -90,6 +90,8 @@ def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor
 
 # Determines which simulated flights are inside the boundary.
 def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights):
+    simulated_flights = [convert_to_processed_flight(flight, idx) for idx, flight in enumerate(simulated_flights)]
+    print("processed flights: ", simulated_flights, type(simulated_flights))
     flight_data = []
     query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
     
@@ -98,7 +100,7 @@ def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flig
         flight_lon = flight.longitude
         distance = haversine(observer_lat, observer_lon, flight_lat, flight_lon)
         
-        # If the distance is less than or equal to the radius, the flight is in the circular FOV
+        # If the distance is less than or equal to the radius, the flight is in the horizon
         if distance <= query_radius:
             flight_data.append(flight)
         
@@ -109,3 +111,14 @@ def find_live_flights_in_horizon (observer_lat, observer_lon):
     flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, query_radius)
 
     return flight_data
+
+def convert_to_processed_flight(flight_data, flight_number=0):
+    return ProcessedFlightInfo(
+        id=uuid.uuid4(),  # Generate a unique ID
+        flightNumber=0,
+        latitude=float(flight_data["latitude"]),
+        longitude=float(flight_data["longitude"]),
+        altitude=float(flight_data["altitude"]),  # Already in feet
+        speed=float(flight_data["speed"]),  # Already in knots
+        heading=float(flight_data["heading"])  # Convert string to float
+    )
