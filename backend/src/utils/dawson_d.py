@@ -69,9 +69,6 @@ def d2(fov, NN, MM, RA, Dec):
     # calculate distances
     d1 = distance_to_fov_path_1(bb, NN, MM, RA, Dec, gg)
     d2 = distance_to_fov_path_2(bb, NN, MM, RA, Dec, gg)
-    print(f"gg:{gg}")
-    print(f"d1:{d1}")
-    print(f"d2:{d2}")
 
     # find intersection time
     tint1 = intersection_time(d1, ddis)

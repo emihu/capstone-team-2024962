@@ -1,0 +1,74 @@
+.container {
+    justify-content: center;  /* Centers horizontally */
+}
+
+.fov-frame {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    border: 1px solid #000000;
+    background-color: #151515;
+    border-radius: 50%;
+    margin-left: 26%;
+}
+
+.fov-title {
+    color: rgb(0, 0, 0);
+    margin-top: 10px;
+    font-weight: 600;
+    margin-left: 45%;
+    font-size: large;
+}
+
+.pill-title {
+    color: #4e4e4e;
+    margin-top: 10px;
+    font-weight: 600;
+    margin-left: 45%;
+    font-size: large;
+}
+
+
+.exposure-pill-container {
+    width: 800px;
+    height: 25px;
+    background-color: #4e4e4e;
+    position: relative;
+    margin-top: 10px;
+    margin-left: 18%;
+    border-radius: 10px;
+}
+
+.exposure-pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: #2e2e2e;
+    transition: width 0.3s;
+    border-radius: 10px;
+}
+
+.blue-dot, .green-dot, .red-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+}
+
+.blue-dot { background-color: #719AE9; }
+.green-dot { background-color: #4CAF50; }
+.red-dot { background-color: #F44336; }
+
+.message-box {
+    position: absolute;
+    top: 49%;
+    left: 52%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: auto;
+}
+
+.message {
+    padding: 10px;
+}
+

@@ -24,6 +24,19 @@ class ProcessedFlightInfo:
 
     def __str__(self):
         return f"{self.id} {self.flightNumber} {self.latitude} {self.longitude} {self.altitude} {self.speed} {self.heading}"
+    
+    def to_dict(self):
+        """ Convert object to JSON-serializable dictionary. """
+        return {
+            "flight_number": self.flightNumber,
+            "altitude": self.altitude,
+            "heading": self.heading,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "speed": self.speed,
+            "entry": self.entry.isoformat() if self.entry else None,  # Convert datetime to string
+            "exit": self.exit.isoformat() if self.exit else None,  # Convert datetime to string
+        }
 
 @dataclass
 class HMS:

@@ -1,7 +1,7 @@
 import math
-from src.utils.localsidereal import get_local_sidereal_time
-from src.utils.dawson_b3 import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, lon_to_theta
-from src.utils.constants import EARTH_RADIUS_METER
+from utils.localsidereal import get_local_sidereal_time
+from utils.dawson_b3 import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, lon_to_theta
+from utils.constants import EARTH_RADIUS_METER
 
 
 def spherical_to_cartesian(r, theta, phi) -> tuple[float, float, float]:
