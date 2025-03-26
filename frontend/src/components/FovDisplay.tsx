@@ -1,5 +1,5 @@
 import React from "react";
-import { Col, Row, Alert } from "react-bootstrap";
+import { Row, Alert } from "react-bootstrap";
 import Airplane from "./Airplane";
 import "./FovDisplay.css";
 
@@ -16,7 +16,6 @@ interface FovDisplayProps {
 
 const FovDisplay: React.FC<FovDisplayProps> = ({
   isLoading,
-  flightData,
   isFlightDataEmpty,
   fovCenterRA,
   fovCenterDec,

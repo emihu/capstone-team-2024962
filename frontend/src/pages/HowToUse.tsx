@@ -1,6 +1,4 @@
-import React from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { FaSearch, FaTable, FaMapMarkedAlt, FaCog, FaLightbulb } from "react-icons/fa";
 import "./HowToUse.css";
 
 function HowToUse() {
