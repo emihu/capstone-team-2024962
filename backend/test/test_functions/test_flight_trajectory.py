@@ -1,14 +1,14 @@
 import pytest
 import math
-from src.utils.dawson_b3 import (
+from utils.flight_trajectory import (
     phi_angular_speed,
     phi_signed_current_position,
     phi_current_position,
     theta_angular_speed,
     theta_current_position,
-    phi_to_lat
 )
-from src.utils import constants
+from utils.conversion import phi_to_lat
+from utils import constants
 
 def deg_to_rad(deg):
     return deg * math.pi / 180
