@@ -40,7 +40,7 @@ function HowToUse() {
               Step 3: Submit your data
             </h4>
             <p>
-              Click the <strong>Submit</strong> button to process your input. SkyClear will analyze real-time flight 
+              Click the <strong>Submit</strong> button to process your input. ClearSkies will analyze real-time flight 
               data or use the customized simulated flight data to identify potential interferences.
             </p>
 
