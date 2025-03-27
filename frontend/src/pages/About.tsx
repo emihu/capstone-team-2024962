@@ -4,7 +4,7 @@ import "./About.css";
 
 function About() {
   return (
-    <Container className="mt-5">
+    <Container fluid className="mt-5 mb-5">
       <Row className="justify-content-center">
         <Col md={8}>
           <Card className="p-4 shadow-sm border-0 bg-light">
