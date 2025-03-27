@@ -8,9 +8,7 @@ from astropy.time import Time
 import uuid
 
 
-from src.utils.integration import find_flights_intersecting
-from src.utils.fov import check_flights_in_fov
-from src.utils.datatypes import ProcessedFlightInfo
+from utils.integration import find_flights_intersecting
 
 
 def test_integration():
@@ -30,9 +28,14 @@ def test_integration():
     observer_lon = 0
     observer_elev = 0
 
-    simulated_flights = [
-        ProcessedFlightInfo(uuid.uuid4(), "SIM1", 0.001, 0, 30000, 800, 180)
-    ]
+    simulated_flights = [{
+        "latitude": 0,
+        "longitude": 0,
+        "altitude": 30000,
+        "speed": 800,
+        "heading": 180,
+    }]
+
     # Run
     flights_position, flight_data = find_flights_intersecting(focal_length, camera_sensor_size, barlow_reducer_factor,
                                                                             exposure, fov_center_ra_h, fov_center_ra_m, fov_center_ra_s, fov_center_dec,
