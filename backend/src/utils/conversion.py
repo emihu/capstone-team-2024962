@@ -217,8 +217,6 @@ def aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)->tuple[f
     # Get theta in radians, rotated by 90 degrees
     theta = lon_to_theta(gps_lon)
     phi = lat_to_phi(gps_lat)
-    print("theta", theta)
-    print("phi", phi)
 
     aircraft_x, aircraft_y, aircraft_z = aircraft_vector
     x = math.cos(theta) * aircraft_x + math.sin(theta) * aircraft_y

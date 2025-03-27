@@ -17,10 +17,10 @@ def test_integration():
     camera_sensor_size = 50
     barlow_reducer_factor = 1
     exposure = 300
-    fov_center_ra_h = 1
-    fov_center_ra_m = 16
-    fov_center_ra_s = 0
-    fov_center_dec = 14.63
+    fov_center_ra_h = 0
+    fov_center_ra_m = 0
+    fov_center_ra_s = 10
+    fov_center_dec = -66.118
     time = Time(datetime(2025,3,13,12,34,22,tzinfo=timezone.utc))
 
     # observer and Flight information
