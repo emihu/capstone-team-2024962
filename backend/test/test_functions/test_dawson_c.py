@@ -1,6 +1,6 @@
 import pytest
 from utils import constants
-from utils import dawson_c
+from utils import conversion
 import math
 
 
@@ -10,7 +10,7 @@ import math
     
 ])
 def test_gps_cartesian(lat, lon, expected):
-    result = dawson_c.gps_cartesian(lat, lon, 0)
+    result = conversion.gps_cartesian(lat, lon, 0)
     # round to 2 decimal places
     assert pytest.approx(result, abs=1e-3) == expected
 

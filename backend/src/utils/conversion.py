@@ -1,8 +1,144 @@
+"""
+File to handle conversion between coordinate systems.
+"""
+from astropy.time import Time
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+
 import math
+
+from utils.datatypes import HMS
 from utils.localsidereal import get_local_sidereal_time
-from utils.dawson_b3 import deg_to_rad, rad_to_deg, lat_to_phi, normalize_longitude, lon_to_theta
 from utils.constants import EARTH_RADIUS_METER
 
+def deg_to_rad(deg) -> float:
+    """
+    Convert degrees to radians.
+    """
+    angle =  deg * math.pi / 180
+    return angle
+
+def rad_to_deg(rad) -> float:
+    """
+    Convert radians to degrees.
+    """
+    return rad * 180 / math.pi 
+
+def lat_to_phi(lat) -> float:
+    """
+    Convert latitude to phi angle.
+    lat: The latitude in degrees.
+    return: The angle in radians.
+    """
+    if (lat > 90 or lat < -90):
+        raise ValueError("Latitude must be between -90 and 90 degrees.")
+    return math.pi / 2 - deg_to_rad(lat)
+
+def lon_to_theta(lon) -> float:
+    """
+    Convert longitude to theta angle.
+    lon: The longitude in degrees.
+    return: The angle in radians.
+    """
+    if (lon > 180 or lon < -180):
+        raise ValueError("Longitude must be between -180 and 180 degrees.")
+    return deg_to_rad(normalize_longitude(lon))
+
+def phi_to_lat(phi) -> float:
+    """
+    Convert the phi angle to latitude.
+    phi: The angle in radians.
+    return: The latitude in degrees.
+    """
+    if (phi > math.pi or phi < 0):
+        raise ValueError("Phi angle must be less than or equal to pi.")
+    return rad_to_deg(math.pi / 2 - phi)
+
+def theta_to_lon(theta) -> float:
+    """
+    Convert the theta angle to longitude.
+    theta: The angle in radians.
+    return: The longitude in degrees.
+    """
+    if (theta > 2 * math.pi or theta < 0):
+        raise ValueError("Theta angle must be less than or equal to 2pi.")
+    return unconvert_longitude(rad_to_deg(theta))
+
+def normalize_longitude(lon) -> float:
+    """
+    Normalize the longitude to be in the range of [0, 360).
+    """
+    if lon < 0:
+        return lon + 360
+    return lon
+
+def unconvert_longitude(lon) -> float:
+    """
+    convert the longitude to be in the range of (-180, 180]
+    """
+    return lon if lon <= 180 else lon - 360
+
+
+def convert_ra_dec_to_lat_lon(*, ra: float | HMS, dec, time=None, ra_format="deg"):
+    """
+    Convert Right Ascension (RA) and Declination (DEC) to an Earth “subpoint” 
+    (latitude, longitude) where the object would be at the zenith.
+    
+    This conversion assumes that the object is effectively at an infinite
+    distance so that the subpoint is defined by:
+        - latitude = declination
+        - longitude = RA (in degrees) - Greenwich Sidereal Time (in degrees)
+    
+    Parameters
+    ----------
+    ra : float or HMS
+    dec : float, declination in degrees
+    time : astropy.time.Time or str or None, optional
+        The observation time. If None, Time.now() is used.
+    ra_format : str, optional
+        Format of the RA input. Either "deg" (default) or "hms".
+    return: (lat, lon) : tuple of astropy.coordinates.Angle
+    raise ValueError: If the input values are invalid.
+    """
+    # Handle the time input
+    if time is None:
+        time = Time.now()
+    elif isinstance(time, str):
+        try:
+            time = Time(time)
+        except Exception as e:
+            raise ValueError(f"Invalid time format: {e}")
+
+    # Convert RA to degrees
+    if ra_format.lower() == "hms":
+        if isinstance(ra, HMS):
+            ra_deg = ra.to_degrees()
+        else:
+            raise ValueError("For 'hms' format, RA must be an HMS object or a tuple/list (hours, minutes, seconds).")
+    elif ra_format.lower() == "deg":
+        try:
+            ra_deg = float(ra)
+        except Exception as e:
+            raise ValueError("For 'deg' format, RA must be convertible to a float.")
+    else:
+        raise ValueError("Invalid 'ra_format'. Use 'deg' or 'hms'.")
+
+    # Create a SkyCoord for the celestial object in ICRS (equatorial) coordinates
+    sky_coord = SkyCoord(ra=ra_deg * u.deg, dec=dec * u.deg, frame="icrs")
+
+    # Get Greenwich Sidereal Time as an Angle, then convert it to degrees.
+    # Note: time.sidereal_time() returns an angle in hour units by default.
+    gst = time.sidereal_time('mean', 'greenwich').to(u.deg)
+
+    # Compute the subpoint's longitude: RA (in degrees) minus GST
+    sub_lon = (sky_coord.ra - gst).wrap_at(180 * u.deg)
+
+    # The subpoint's latitude is simply the declination.
+    sub_lat = sky_coord.dec
+
+    return (sub_lat, sub_lon)
+
+    
 
 def spherical_to_cartesian(r, theta, phi) -> tuple[float, float, float]:
     """
@@ -171,13 +307,9 @@ def aircraft_theta_phi_to_radec(aircraft_theta, aircraft_phi, aircraft_alt, gps_
     :raise ValueError: If the azimuth or elevation is out of range.
     :raise ValueError: If phi is not in the range of [0, pi] or theta is not in the range of [0, 2pi].
     """
-    print("====================")
     gps_cart = gps_cartesian(gps_lat, gps_lon, gps_alt)
     aircraft_cart = aircraft_theta_phi_to_cartesian(aircraft_theta, aircraft_phi, aircraft_alt)
     aircraft_vector = aircraft_vector_from_gps(gps_cart, aircraft_cart)
     aircraft_vector_aligned = aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)
-    print("aircraft_vector_aligned", aircraft_vector_aligned)
     azele = azimuth_elevation_from_vector(aircraft_vector_aligned)
-    print("azimuth, elevation", azele)
-    print("====================")
     return aziele_to_radec(azele, gps_lat, gps_lon, time)

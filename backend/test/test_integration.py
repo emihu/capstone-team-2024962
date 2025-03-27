@@ -9,8 +9,6 @@ import uuid
 
 
 from utils.integration import find_flights_intersecting
-from utils.fov import check_flights_in_fov
-from utils.datatypes import ProcessedFlightInfo
 
 
 def test_integration():

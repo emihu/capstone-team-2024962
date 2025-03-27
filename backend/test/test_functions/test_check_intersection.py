@@ -1,5 +1,5 @@
 import pytest
-import utils.dawson_d as dawson_d
+import utils.fov as fov
 
 
 def generate_flight_coordinates(flight_start_ra, flight_start_dec, flight_end_ra, flight_end_dec, num_points):
@@ -33,14 +33,14 @@ def generate_flight_coordinates(flight_start_ra, flight_start_dec, flight_end_ra
         (1, 0, 0, 1, 1, 2, 2, False),
     ]
 )
-def test_dawson_d2(fov_size, fov_ra, fov_dec, flight_start_ra, flight_start_dec, flight_end_ra, flight_end_dec, expected):
+def test_is_intersecting(fov_size, fov_ra, fov_dec, flight_start_ra, flight_start_dec, flight_end_ra, flight_end_dec, expected):
     num_points = 100
 
     flightRaDec = generate_flight_coordinates(flight_start_ra, flight_start_dec, flight_end_ra, flight_end_dec, num_points)
 
     ret = False
     for info in flightRaDec:
-        ret = dawson_d.is_intersecting(info[0], info[1], fov_ra, fov_dec, fov_size)
+        ret = fov.is_intersecting(info[0], info[1], fov_ra, fov_dec, fov_size)
         if ret:
             break
 
@@ -59,7 +59,7 @@ def test_dawson_d2(fov_size, fov_ra, fov_dec, flight_start_ra, flight_start_dec,
         (4.77464829, 0, 5, 0, -91, 0, 5)
     ]
 )
-def test_dawson_d_out_of_bounds(fov_size, fov_ra, fov_dec,
+def test_is_intersecting_out_of_bounds(fov_size, fov_ra, fov_dec,
                                 flight_start_ra, flight_start_dec,
                                 flight_end_ra, flight_end_dec):
     num_points = 10
@@ -69,4 +69,4 @@ def test_dawson_d_out_of_bounds(fov_size, fov_ra, fov_dec,
     # Expecting a ValueError to be raised if any coordinate is out-of-bound
     with pytest.raises(ValueError):
         for info in flightRaDec:
-            _ = dawson_d.is_intersecting(info[0], info[1], fov_ra, fov_dec, fov_size)
+            _ = fov.is_intersecting(info[0], info[1], fov_ra, fov_dec, fov_size)

@@ -1,6 +1,5 @@
 import math
 import utils.flight_api as fa
-import utils.coord2 as co
 from utils.datatypes import ProcessedFlightInfo
 import uuid
 from utils.constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT
@@ -34,59 +33,6 @@ def haversine(lat1, lon1, lat2, lon2):
     c = 2 * math.asin(math.sqrt(a))
     
     return c * EARTH_RADIUS_METER
-
-# Determines which simulated flights are inside the telescope FOV.
-#TODO: refactor this function to use processed flight info
-def find_simulated_flights_in_fov(fov_center_lat, fov_center_lon, radius, simulated_flights) -> list[ProcessedFlightInfo]:
-    flights_in_fov : list[ProcessedFlightInfo] = []
-    
-    for flight in simulated_flights:
-        flight_lat = flight['latitude']
-        flight_lon = flight['longitude']
-        distance = haversine(float(fov_center_lat), float(fov_center_lon), float(flight_lat), float(flight_lon))
-        
-        # If the distance is less than or equal to the radius, the flight is in the circular FOV
-        # TODO: Lawrence please confirm if this is the correct way to populate the data
-        if distance <= radius:
-            flights_in_fov.append(ProcessedFlightInfo(
-                id=uuid.uuid4(),
-                flightNumber=flight['flightNumber'],
-                latitude=flight_lat,
-                longitude=flight_lon,
-                altitude=flight['altitude'],
-                speed=flight['speed'],
-                heading=flight['heading']
-            ))
-        
-    return flights_in_fov
-
-
-def check_flights_in_fov(focal_length, camera_sensor_size, barlow_reducer_factor, \
-                         fov_center_ra_h, fov_center_ra_m, fov_center_ra_s, \
-                         fov_center_dec, flight_data_type, simulated_flights, time=None):
-    # find radius of the fov
-    fov_size = calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
-    radius = abs(fov_degrees_to_meters(fov_size, distance_meters=12801.6))
-
-    # convert to lat lon
-    result = co.convert_ra_dec_to_lat_lon(ra=(fov_center_ra_h,fov_center_ra_m,fov_center_ra_s), dec = fov_center_dec, ra_format="hms", time=time)
-    fov_center_lat = result[0]
-    fov_center_lon = result[1]
-
-    print("input: ", fov_center_lat, fov_center_lon, radius)
-
-    # TODO: put the integration function here
-    if flight_data_type == "live":
-        flight_info : list[ProcessedFlightInfo] = fa.find_flights_in_circ_boundary(fov_center_lat, fov_center_lon, radius)
-    else:
-        flight_info: list[ProcessedFlightInfo] = find_simulated_flights_in_fov(
-            fov_center_lat, fov_center_lon, radius, simulated_flights)
-
-    #return flight_info
-    return {
-        "flight_info": flight_info,
-        "fov_border": {"lat": fov_center_lat, "lon": fov_center_lon, "radius": radius}
-    }
 
 # Determines which simulated flights are inside the boundary.
 def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights):
@@ -122,3 +68,59 @@ def convert_to_processed_flight(flight_data, flight_number=0):
         speed=float(flight_data["speed"]),  # Already in knots
         heading=float(flight_data["heading"])  # Convert string to float
     )
+
+
+def angular_distance(ra1, dec1, ra2, dec2):
+    """
+    Calculate the angular distance between two celestial points using the haversine formula.
+    
+    Parameters:
+        ra1 (float): Right Ascension of the first point (in degrees)
+        dec1 (float): Declination of the first point (in degrees)
+        ra2 (float): Right Ascension of the second point (in degrees)
+        dec2 (float): Declination of the second point (in degrees)
+    Raise:
+        ValueError: If ra1, dec1, ra2, or dec2 are out of range
+        
+    Returns:
+        float: Angular distance between the two points (in degrees)
+    """
+    # Check if the coordinates are within the valid range
+    if not (-90 <= dec1 <= 90) or not (-90 <= dec2 <= 90) or not (0 <= ra1 <= 360) or not (0 <= ra2 <= 360):
+        raise ValueError("Coordinates out of range")
+
+    # Convert degrees to radians
+    ra1_rad, dec1_rad = math.radians(ra1), math.radians(dec1)
+    ra2_rad, dec2_rad = math.radians(ra2), math.radians(dec2)
+    
+    # Differences in coordinates
+    delta_ra = ra2_rad - ra1_rad
+    delta_dec = dec2_rad - dec1_rad
+    
+    # Haversine formula
+    a = math.sin(delta_dec / 2)**2 + math.cos(dec1_rad) * math.cos(dec2_rad) * math.sin(delta_ra / 2)**2
+    c = 2 * math.asin(math.sqrt(a))
+    
+    # Convert the result from radians to degrees
+    return math.degrees(c)
+
+    
+def is_intersecting(ra1, dec1, ra2, dec2, fov_size) -> bool:
+    """
+    Check if the line of sight between two celestial points intersects with the field of view.
+    
+    Parameters:
+        ra1 (float): Right Ascension of the first point (in degrees)
+        dec1 (float): Declination of the first point (in degrees)
+        ra2 (float): Right Ascension of the second point (in degrees)
+        dec2 (float): Declination of the second point (in degrees)
+        fov_size (float): Field of view size (in degrees)
+        
+    Returns:
+        bool: True if the line of sight intersects with the field of view, False otherwise
+    """
+    # Calculate the angular distance between the two points
+    angle = angular_distance(ra1, dec1, ra2, dec2)
+    
+    # Check if the angular distance is within the field of view
+    return angle < fov_size

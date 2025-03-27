@@ -1,9 +1,8 @@
 
 from utils.datatypes import ProcessedFlightInfo, HMS
 from astropy.time import Time, TimeDelta
-import utils.dawson_b3 as dawson_b3
-import utils.dawson_c as dawson_c
-import utils.dawson_d as dawson_d
+import utils.flight_trajectory as flight_trajectory
+import utils.conversion as conversion
 import utils.fov as fov
 from utils.constants import EARTH_RADIUS_METER
 
@@ -89,13 +88,13 @@ def convert_flight_lat_lon_to_ra_dec(flight: ProcessedFlightInfo, updated_observ
     flight_speed: float = flight.speed * 0.514444 # convert speed from knots to m/s
     flight_alt: float = flight.altitude / 3.28084 # convert altitude from feet to meters
 
-    phi: float = dawson_b3.phi_current_position(
+    phi: float = flight_trajectory.phi_current_position(
         flight_speed, EARTH_RADIUS_METER, flight_alt, flight.heading, elapsed_time, flight.latitude)
-    theta: float = dawson_b3.theta_current_position(
+    theta: float = flight_trajectory.theta_current_position(
         flight_speed, EARTH_RADIUS_METER, flight_alt, flight.heading, elapsed_time, flight.latitude, flight.longitude)
 
     # TODO: get user altitude from frontend
-    return dawson_c.aircraft_theta_phi_to_radec(
+    return conversion.aircraft_theta_phi_to_radec(
         theta, phi, flight_alt, user_gps["latitude"], user_gps["longitude"], 0, updated_observer_time)
 
     
@@ -114,7 +113,7 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
         flight.RA, flight.Dec = convert_flight_lat_lon_to_ra_dec(flight, updated_time, elapsed_time, user_gps)
         
-        is_intersecting = dawson_d.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
+        is_intersecting = fov.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
 
         # add flight if entering/exiting the fov
         if is_intersecting:

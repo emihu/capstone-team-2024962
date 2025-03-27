@@ -2,73 +2,7 @@
 This file contains the implementation of the Dawson Math 3D library.
 """
 import math
-
-def deg_to_rad(deg) -> float:
-    """
-    Convert degrees to radians.
-    """
-    angle =  deg * math.pi / 180
-    return angle
-
-def rad_to_deg(rad) -> float:
-    """
-    Convert radians to degrees.
-    """
-    return rad * 180 / math.pi 
-
-def lat_to_phi(lat) -> float:
-    """
-    Convert latitude to phi angle.
-    lat: The latitude in degrees.
-    return: The angle in radians.
-    """
-    if (lat > 90 or lat < -90):
-        raise ValueError("Latitude must be between -90 and 90 degrees.")
-    return math.pi / 2 - deg_to_rad(lat)
-
-def lon_to_theta(lon) -> float:
-    """
-    Convert longitude to theta angle.
-    lon: The longitude in degrees.
-    return: The angle in radians.
-    """
-    if (lon > 180 or lon < -180):
-        raise ValueError("Longitude must be between -180 and 180 degrees.")
-    return deg_to_rad(normalize_longitude(lon))
-
-def phi_to_lat(phi) -> float:
-    """
-    Convert the phi angle to latitude.
-    phi: The angle in radians.
-    return: The latitude in degrees.
-    """
-    if (phi > math.pi or phi < 0):
-        raise ValueError("Phi angle must be less than or equal to pi.")
-    return rad_to_deg(math.pi / 2 - phi)
-
-def theta_to_lon(theta) -> float:
-    """
-    Convert the theta angle to longitude.
-    theta: The angle in radians.
-    return: The longitude in degrees.
-    """
-    if (theta > 2 * math.pi or theta < 0):
-        raise ValueError("Theta angle must be less than or equal to 2pi.")
-    return unconvert_longitude(rad_to_deg(theta))
-
-def normalize_longitude(lon) -> float:
-    """
-    Normalize the longitude to be in the range of [0, 360).
-    """
-    if lon < 0:
-        return lon + 360
-    return lon
-
-def unconvert_longitude(lon) -> float:
-    """
-    convert the longitude to be in the range of (-180, 180]
-    """
-    return lon if lon <= 180 else lon - 360
+from utils.conversion import deg_to_rad, normalize_longitude
 
 def phi_angular_speed(speed, radius, height, bearing) -> float:
     """
