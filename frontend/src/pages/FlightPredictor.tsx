@@ -56,7 +56,9 @@ function FlightPredictor() {
   const flightDataType = watch("flightDataType");
 
   const remainingTimePercentage =
-    ((exposureTime - counter * 5) / exposureTime) * 100;
+    ((counter * 5) / exposureTime) * 100;
+
+  const elapsedTime = counter * 5;
 
   const isFlightDataEmpty = Object.values(flightsPosition).every(
     (arr) => arr.length === 0
@@ -67,7 +69,7 @@ function FlightPredictor() {
       setCounter((prevCounter) =>
         prevCounter >= flightsPosition.length - 1 ? 0 : prevCounter + 1
       );
-    }, 1000);
+    }, 300);
 
     return () => clearInterval(intervalId);
   }, [flightsPosition]);
@@ -658,6 +660,7 @@ function FlightPredictor() {
         fovCenterDec={fovCenterDec}
         visibleFlights={visibleFlights}
         currentExposureTime={exposureTime}
+        elapsedTime={elapsedTime}
         remainingTimePercentage={remainingTimePercentage}
       />
     </div>

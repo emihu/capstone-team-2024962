@@ -11,6 +11,7 @@ interface FovDisplayProps {
   fovCenterDec: number;
   visibleFlights: any; // Replace 'any' with the appropriate type
   currentExposureTime: number;
+  elapsedTime: number;
   remainingTimePercentage: number;
 }
 
@@ -21,6 +22,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
   fovCenterDec,
   visibleFlights,
   currentExposureTime,
+  elapsedTime,
   remainingTimePercentage,
 }) => {
   return (
@@ -53,7 +55,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
       {/* Exposure time pill */}
       {!isLoading && (
         <>
-          <div className="pill-title">Next {currentExposureTime} seconds</div>
+          <div className="pill-title">Time elapsed: {elapsedTime} seconds</div>
           <div className="exposure-pill-container">
             <div
               className="exposure-pill"
