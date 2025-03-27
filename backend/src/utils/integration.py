@@ -113,7 +113,6 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
     for flight in flight_data:
 
         flight.RA, flight.Dec = convert_flight_lat_lon_to_ra_dec(flight, updated_time, elapsed_time, user_gps)
-        print(flight.RA, flight.Dec)
         
         is_intersecting = dawson_d.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
 

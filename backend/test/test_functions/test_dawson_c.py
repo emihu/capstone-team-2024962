@@ -1,36 +1,24 @@
 import pytest
-from src.utils import constants
-from src.utils import dawson_c
+from utils import constants
+from utils import dawson_c
 import math
 
 
 @pytest.mark.parametrize("lat, lon, expected", [
-    (0, 0, (6371000, 0, 0)),
-    (90, 0, (6371000, 0, 0)),
-    (-90, 0, (6371000, 0, 0)),
-    (0, 90, (6371000, 0, 0)),
-    (0, -90, (6371000, 0, 0)),
-    (45, 45, (6371000, 0, 0)),
-    (-45, -45, (6371000, 0, 0)),
-    (0, 180, (6371000, 0, 0)),
-    (0, -180, (6371000, 0, 0)),
-    (90, 180, (6371000, 0, 0)),
-    (-90, 180, (6371000, 0, 0)),
-    (90, -180, (6371000, 0, 0)),
-    (-90, -180, (6371000, 0, 0)),
-    (45, 180, (6371000, 0, 0)),
-    (-45, 180, (6371000, 0, 0)),
-    (45, -180, (6371000, 0, 0)),
-    (-45, -180, (6371000, 0, 0)),
-    (45, 90, (6371000, 0, 0)),
-    (-45, 90, (6371000, 0, 0)),
-    (45, -90, (6371000, 0, 0)),
-    (-45, -90, (6371000, 0, 0)),
+    # Test 1: Latitude and longitude are both 0
+    (0, 0, (0, constants.EARTH_RADIUS_METER, 0)),
+    
 ])
 def test_gps_cartesian(lat, lon, expected):
-    assert dawson_c.gps_cartesian(lat, lon) == expected
+    result = dawson_c.gps_cartesian(lat, lon, 0)
+    # round to 2 decimal places
+    assert pytest.approx(result, abs=1e-3) == expected
 
-def test_aircraft_theta_phi_to_cartesian():
+@pytest.mark.parametrize("lat, lon, alt, expected", [
+    # Test 1: Latitude and longitude are both 0
+    (0, 0, 0, (0, constants.EARTH_RADIUS_METER, 0)),
+])
+def test_aircraft_theta_phi_to_cartesian(lat, lon, alt, expected):
     pass
 
 def test_aircraft_vector_from_gps():

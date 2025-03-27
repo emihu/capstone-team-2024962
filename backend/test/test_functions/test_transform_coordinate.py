@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 from astropy.time import Time
 import pytest
-import src.utils.dawson_c as dawson_c
-import src.utils.dawson_b3 as dawson_b
+import utils.dawson_c as dawson_c
+import utils.dawson_b3 as dawson_b
 
 
 def test_lat_lon_to_ra_dec():

@@ -81,6 +81,8 @@ def aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)->tuple[f
     # Get theta in radians, rotated by 90 degrees
     theta = lon_to_theta(gps_lon)
     phi = lat_to_phi(gps_lat)
+    print("theta", theta)
+    print("phi", phi)
 
     aircraft_x, aircraft_y, aircraft_z = aircraft_vector
     x = math.cos(theta) * aircraft_x + math.sin(theta) * aircraft_y
@@ -97,8 +99,11 @@ def azimuth_elevation_from_vector(vector: tuple)->tuple[float, float]:
     """
     x, y, z = vector
 
-    theta = math.atan2(y, x)
-    azimuth = (deg_to_rad(450) - theta) % 2*math.pi
+    east = -x
+    north = -y
+
+    theta = math.atan2(north, east)
+    azimuth = (deg_to_rad(450) - theta) % (2*math.pi)
     
     elevation = math.atan2(z, math.sqrt(x**2 + y**2))
 
@@ -166,9 +171,13 @@ def aircraft_theta_phi_to_radec(aircraft_theta, aircraft_phi, aircraft_alt, gps_
     :raise ValueError: If the azimuth or elevation is out of range.
     :raise ValueError: If phi is not in the range of [0, pi] or theta is not in the range of [0, 2pi].
     """
+    print("====================")
     gps_cart = gps_cartesian(gps_lat, gps_lon, gps_alt)
     aircraft_cart = aircraft_theta_phi_to_cartesian(aircraft_theta, aircraft_phi, aircraft_alt)
     aircraft_vector = aircraft_vector_from_gps(gps_cart, aircraft_cart)
     aircraft_vector_aligned = aircraft_vector_from_gps_aligned(aircraft_vector, gps_lat, gps_lon)
+    print("aircraft_vector_aligned", aircraft_vector_aligned)
     azele = azimuth_elevation_from_vector(aircraft_vector_aligned)
+    print("azimuth, elevation", azele)
+    print("====================")
     return aziele_to_radec(azele, gps_lat, gps_lon, time)

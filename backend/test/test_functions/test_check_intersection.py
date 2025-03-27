@@ -1,5 +1,5 @@
 import pytest
-import src.utils.dawson_d as dawson_d
+import utils.dawson_d as dawson_d
 
 
 def generate_flight_coordinates(flight_start_ra, flight_start_dec, flight_end_ra, flight_end_dec, num_points):
