@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import "bootstrap/dist/css/bootstrap.css";
@@ -197,473 +198,480 @@ function FlightPredictor() {
   };
 
   return (
-    <div className="container">
-      <h1>Flight Predictor</h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <br></br>
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">Focal Length</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("focalLength", {
-                min: {
-                  value: 0,
-                  message: "Focal length must be positive",
-                },
-              })}
-            />
-            <span className="text-muted">mm</span>
-          </div>
-          {errors.focalLength && (
-            <div className="text-danger mt-1">{errors.focalLength.message}</div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">
-            Camera Sensor Diagonal Dimension
-          </label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("cameraSensorSize", {
-                min: {
-                  value: 0,
-                  message: "Camera sensor size must be positive",
-                },
-              })}
-            />
-            <span className="text-muted">mm</span>
-          </div>
-          {errors.cameraSensorSize && (
-            <div className="text-danger mt-1">
-              {errors.cameraSensorSize.message}
-            </div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">Barlow/Reducer Factor</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("barlowReducerFactor", {
-                min: {
-                  value: 0,
-                  message: "Barlow/reducer factor must be positive",
-                },
-              })}
-            />
-            <span className="text-muted">x</span>
-          </div>
-          {errors.barlowReducerFactor && (
-            <div className="text-danger mt-1">
-              {errors.barlowReducerFactor.message}
-            </div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">Exposure Time</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("exposure", {
-                min: {
-                  value: 0,
-                  message: "Exposure must be positive",
-                },
-              })}
-            />
-            <span className="text-muted">secs</span>
-          </div>
-          {errors.exposure && (
-            <div className="text-danger mt-1">{errors.exposure.message}</div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">FOV Center - RA</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("fovCenterRaH", {
-                min: {
-                  value: 0,
-                  message: "Hour must be between 0 and 23",
-                },
-                max: {
-                  value: 23,
-                  message: "Hour must be between 0 and 23",
-                },
-              })}
-            />
-            <span className="text-muted pe-4">hours</span>
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("fovCenterRaM", {
-                min: {
-                  value: 0,
-                  message: "Minute must be between 0 and 59",
-                },
-                max: {
-                  value: 59,
-                  message: "Minute must be between 0 and 59",
-                },
-              })}
-            />
-            <span className="text-muted pe-4">mins</span>
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("fovCenterRaS", {
-                min: {
-                  value: 0,
-                  message: "Second must be between 0 and 59",
-                },
-                max: {
-                  value: 59,
-                  message: "Second must be between 0 and 59",
-                },
-              })}
-            />
-            <span className="text-muted pe-4">secs</span>
-          </div>
-          {errors.fovCenterRaH && (
-            <div className="text-danger mt-1">
-              {errors.fovCenterRaH.message}
-            </div>
-          )}
-          {errors.fovCenterRaM && (
-            <div className="text-danger mt-1">
-              {errors.fovCenterRaM.message}
-            </div>
-          )}
-          {errors.fovCenterRaS && (
-            <div className="text-danger mt-1">
-              {errors.fovCenterRaS.message}
-            </div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">FOV Center - Dec</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("fovCenterDec", {
-                min: {
-                  value: -90,
-                  message: "Declination must be between -90 and 90",
-                },
-                max: {
-                  value: 90,
-                  message: "Declination must be between -90 and 90",
-                },
-              })}
-            />
-            <span className="text-muted">deg</span>
-          </div>
-          {errors.fovCenterDec && (
-            <div className="text-danger mt-1">
-              {errors.fovCenterDec.message}
-            </div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">Latitude</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("latitude", {
-                min: {
-                  value: -90,
-                  message: "Latitude must be between -90 and 90",
-                },
-                max: {
-                  value: 90,
-                  message: "Latitude must be between -90 and 90",
-                },
-              })}
-            />
-            <span className="text-muted">deg</span>
-          </div>
-          {errors.latitude && (
-            <div className="text-danger mt-1">{errors.latitude.message}</div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">Longitude</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("longitude", {
-                min: {
-                  value: -180,
-                  message: "Longitude must be between -180 and 180",
-                },
-                max: {
-                  value: 180,
-                  message: "Longitude must be between -180 and 180",
-                },
-              })}
-            />
-            <span className="text-muted">deg</span>
-          </div>
-          {errors.longitude && (
-            <div className="text-danger mt-1">{errors.longitude.message}</div>
-          )}
-        </div>
-
-        <div className="row mb-3 pt-2">
-          <label className="col-md-3 form-label">Altitude</label>
-          <div className="col-md-6 d-flex align-items-center gap-2">
-            <input
-              type="number"
-              step="any"
-              className="form-control w-auto"
-              {...register("altitude")}
-            />
-            <select
-              className="form-select w-auto"
-              {...register("altitudeUnit")}
-            >
-              <option value="m">m</option>
-              <option value="ft">ft</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Select Flight Data Source</label>
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              value="live"
-              {...register("flightDataType")}
-            />
-            <label className="form-check-label">Live Data</label>
-          </div>
-          <div className="form-check">
-            <input
-              type="radio"
-              className="form-check-input"
-              value="simulated"
-              {...register("flightDataType")}
-            />
-            <label className="form-check-label">Simulated Data</label>
-          </div>
-        </div>
-
-        {flightDataType === "simulated" && (
-          <div className="p-4" style={{ backgroundColor: "#e6e6e6" }}>
-            <div className="row mb-3 pt-2">
-              <label className="col-md-3 form-label">Date and Time</label>
-              <div className="col-md-6 d-flex align-items-center gap-2">
-                <input
-                  type="datetime-local"
-                  className="form-control w-auto"
-                  {...register("datetime")}
-                />
+    <Container fluid className="mt-5 mb-5">
+      <Row className="justify-content-center">
+        <Col md={8}>
+          <Card className="p-4 shadow-sm border-0 bg-light">
+          <h2 className="text-center mb-4 navy">Flight Predictor</h2>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <br></br>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">Focal Length</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("focalLength", {
+                      min: {
+                        value: 0,
+                        message: "Focal length must be positive",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">mm</span>
+                </div>
+                {errors.focalLength && (
+                  <div className="text-danger mt-1">{errors.focalLength.message}</div>
+                )}
               </div>
-            </div>
 
-            <h4>Add Simulated Flight</h4>
-
-            <div className="row mb-3 pt-2">
-              <label className="col-md-3 form-label">Altitude</label>
-              <div className="col-md-6 d-flex align-items-center gap-2">
-                <input
-                  type="number"
-                  step="any"
-                  className="form-control w-auto"
-                  value={newFlight.altitude}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, altitude: e.target.value })
-                  }
-                />
-                <select
-                  className="form-select w-auto"
-                  value={newFlight.altitudeUnit}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, altitudeUnit: e.target.value })
-                  }
-                >
-                  <option value="ft">ft</option>
-                  <option value="m">m</option>
-                </select>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">
+                  Camera Sensor Diagonal Dimension
+                </label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("cameraSensorSize", {
+                      min: {
+                        value: 0,
+                        message: "Camera sensor size must be positive",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">mm</span>
+                </div>
+                {errors.cameraSensorSize && (
+                  <div className="text-danger mt-1">
+                    {errors.cameraSensorSize.message}
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div className="row mb-3 pt-2">
-              <label className="col-md-3 form-label">Speed</label>
-              <div className="col-md-6 d-flex align-items-center gap-2">
-                <input
-                  type="number"
-                  step="any"
-                  className="form-control w-auto"
-                  value={newFlight.speed}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, speed: e.target.value })
-                  }
-                />
-                <select
-                  className="form-select w-auto"
-                  value={newFlight.speedUnit}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, speedUnit: e.target.value })
-                  }
-                >
-                  <option value="knots">knots</option>
-                  <option value="kph">kph</option>
-                  <option value="mph">mph</option>
-                </select>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">Barlow/Reducer Factor</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("barlowReducerFactor", {
+                      min: {
+                        value: 0,
+                        message: "Barlow/reducer factor must be positive",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">x</span>
+                </div>
+                {errors.barlowReducerFactor && (
+                  <div className="text-danger mt-1">
+                    {errors.barlowReducerFactor.message}
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div className="row mb-3 pt-2">
-              <label className="col-md-3 form-label">Latitude</label>
-              <div className="col-md-6 d-flex align-items-center gap-2">
-                <input
-                  type="number"
-                  step="any"
-                  className="form-control w-auto"
-                  value={newFlight.latitude}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, latitude: e.target.value })
-                  }
-                />
-                <span className="text-muted">deg</span>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">Exposure Time</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("exposure", {
+                      min: {
+                        value: 0,
+                        message: "Exposure must be positive",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">secs</span>
+                </div>
+                {errors.exposure && (
+                  <div className="text-danger mt-1">{errors.exposure.message}</div>
+                )}
               </div>
-            </div>
 
-            <div className="row mb-3 pt-2">
-              <label className="col-md-3 form-label">Longitude</label>
-              <div className="col-md-6 d-flex align-items-center gap-2">
-                <input
-                  type="number"
-                  step="any"
-                  className="form-control w-auto"
-                  value={newFlight.longitude}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, longitude: e.target.value })
-                  }
-                />
-                <span className="text-muted">deg</span>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">FOV Center - RA</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-50"
+                    {...register("fovCenterRaH", {
+                      min: {
+                        value: 0,
+                        message: "Hour must be between 0 and 23",
+                      },
+                      max: {
+                        value: 23,
+                        message: "Hour must be between 0 and 23",
+                      },
+                    })}
+                  />
+                  <span className="text-muted pe-4">hours</span>
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-50"
+                    {...register("fovCenterRaM", {
+                      min: {
+                        value: 0,
+                        message: "Minute must be between 0 and 59",
+                      },
+                      max: {
+                        value: 59,
+                        message: "Minute must be between 0 and 59",
+                      },
+                    })}
+                  />
+                  <span className="text-muted pe-4">mins</span>
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-50"
+                    {...register("fovCenterRaS", {
+                      min: {
+                        value: 0,
+                        message: "Second must be between 0 and 59",
+                      },
+                      max: {
+                        value: 59,
+                        message: "Second must be between 0 and 59",
+                      },
+                    })}
+                  />
+                  <span className="text-muted pe-4">secs</span>
+                </div>
+                {errors.fovCenterRaH && (
+                  <div className="text-danger mt-1">
+                    {errors.fovCenterRaH.message}
+                  </div>
+                )}
+                {errors.fovCenterRaM && (
+                  <div className="text-danger mt-1">
+                    {errors.fovCenterRaM.message}
+                  </div>
+                )}
+                {errors.fovCenterRaS && (
+                  <div className="text-danger mt-1">
+                    {errors.fovCenterRaS.message}
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div className="row mb-3 pt-2">
-              <label className="col-md-3 form-label">Heading</label>
-              <div className="col-md-6 d-flex align-items-center gap-2">
-                <input
-                  type="number"
-                  step="any"
-                  className="form-control w-auto"
-                  value={newFlight.heading}
-                  onChange={(e) =>
-                    setNewFlight({ ...newFlight, heading: e.target.value })
-                  }
-                />
-                <span className="text-muted">deg</span>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">FOV Center - Dec</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("fovCenterDec", {
+                      min: {
+                        value: -90,
+                        message: "Declination must be between -90 and 90",
+                      },
+                      max: {
+                        value: 90,
+                        message: "Declination must be between -90 and 90",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">deg</span>
+                </div>
+                {errors.fovCenterDec && (
+                  <div className="text-danger mt-1">
+                    {errors.fovCenterDec.message}
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={addSimulatedFlight}
-              >
-                Add Flight
-              </button>
-            </div>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">Latitude</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("latitude", {
+                      min: {
+                        value: -90,
+                        message: "Latitude must be between -90 and 90",
+                      },
+                      max: {
+                        value: 90,
+                        message: "Latitude must be between -90 and 90",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">deg</span>
+                </div>
+                {errors.latitude && (
+                  <div className="text-danger mt-1">{errors.latitude.message}</div>
+                )}
+              </div>
 
-            <h4>Simulated Flights</h4>
-            <p>
-              *NOTE: Altitude is converted to feet and speed is converted to
-              knots.
-            </p>
-            <div className="table-responsive">
-              <table className="table table-striped table-bordered table-light">
-                <thead className="thead-dark">
-                  <tr>
-                    <th>Flight Number</th>
-                    <th>Altitude (feet)</th>
-                    <th>Speed (knots)</th>
-                    <th>Latitude (deg)</th>
-                    <th>Longitude (deg)</th>
-                    <th>Heading (deg)</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {simulatedFlights.map((flight: any, index: number) => (
-                    <tr key={index}>
-                      <td>{flight.flightNumber}</td>
-                      <td>{flight.altitude}</td>
-                      <td>{flight.speed}</td>
-                      <td>{flight.latitude}</td>
-                      <td>{flight.longitude}</td>
-                      <td>{flight.heading}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-danger btn-sm"
-                          onClick={() => removeSimulatedFlight(index)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-        <div>
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        </div>
-      </form>
-      <FlightTable data={flightData} />
-      <FovDisplay
-        isLoading={isLoading}
-        flightData={flightData}
-        isFlightDataEmpty={isFlightDataEmpty}
-        fovCenterRA={fovCenterRA}
-        fovCenterDec={fovCenterDec}
-        visibleFlights={visibleFlights}
-        currentExposureTime={exposureTime}
-        elapsedTime={elapsedTime}
-        remainingTimePercentage={remainingTimePercentage}
-      />
-    </div>
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">Longitude</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("longitude", {
+                      min: {
+                        value: -180,
+                        message: "Longitude must be between -180 and 180",
+                      },
+                      max: {
+                        value: 180,
+                        message: "Longitude must be between -180 and 180",
+                      },
+                    })}
+                  />
+                  <span className="text-muted">deg</span>
+                </div>
+                {errors.longitude && (
+                  <div className="text-danger mt-1">{errors.longitude.message}</div>
+                )}
+              </div>
+
+              <div className="row mb-3 pt-2">
+                <label className="col-md-3 form-label">Altitude</label>
+                <div className="col-md-6 d-flex align-items-center gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    className="form-control w-auto"
+                    {...register("altitude")}
+                  />
+                  <select
+                    className="form-select w-auto"
+                    {...register("altitudeUnit")}
+                  >
+                    <option value="m">m</option>
+                    <option value="ft">ft</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Select Flight Data Source</label>
+                <div className="form-check">
+                  <input
+                    type="radio"
+                    className="form-check-input"
+                    value="live"
+                    {...register("flightDataType")}
+                  />
+                  <label className="form-check-label">Live Data</label>
+                </div>
+                <div className="form-check">
+                  <input
+                    type="radio"
+                    className="form-check-input"
+                    value="simulated"
+                    {...register("flightDataType")}
+                  />
+                  <label className="form-check-label">Simulated Data</label>
+                </div>
+              </div>
+
+              {flightDataType === "simulated" && (
+                <div className="p-4" style={{ backgroundColor: "#e6e6e6" }}>
+                  <div className="row mb-3 pt-2">
+                    <label className="col-md-3 form-label">Date and Time</label>
+                    <div className="col-md-6 d-flex align-items-center gap-2">
+                      <input
+                        type="datetime-local"
+                        className="form-control w-auto"
+                        {...register("datetime")}
+                      />
+                    </div>
+                  </div>
+
+                  <h4>Add Simulated Flight</h4>
+
+                  <div className="row mb-3 pt-2">
+                    <label className="col-md-3 form-label">Altitude</label>
+                    <div className="col-md-6 d-flex align-items-center gap-2">
+                      <input
+                        type="number"
+                        step="any"
+                        className="form-control w-auto"
+                        value={newFlight.altitude}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, altitude: e.target.value })
+                        }
+                      />
+                      <select
+                        className="form-select w-auto"
+                        value={newFlight.altitudeUnit}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, altitudeUnit: e.target.value })
+                        }
+                      >
+                        <option value="ft">ft</option>
+                        <option value="m">m</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="row mb-3 pt-2">
+                    <label className="col-md-3 form-label">Speed</label>
+                    <div className="col-md-6 d-flex align-items-center gap-2">
+                      <input
+                        type="number"
+                        step="any"
+                        className="form-control w-auto"
+                        value={newFlight.speed}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, speed: e.target.value })
+                        }
+                      />
+                      <select
+                        className="form-select w-auto"
+                        value={newFlight.speedUnit}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, speedUnit: e.target.value })
+                        }
+                      >
+                        <option value="knots">knots</option>
+                        <option value="kph">kph</option>
+                        <option value="mph">mph</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="row mb-3 pt-2">
+                    <label className="col-md-3 form-label">Latitude</label>
+                    <div className="col-md-6 d-flex align-items-center gap-2">
+                      <input
+                        type="number"
+                        step="any"
+                        className="form-control w-auto"
+                        value={newFlight.latitude}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, latitude: e.target.value })
+                        }
+                      />
+                      <span className="text-muted">deg</span>
+                    </div>
+                  </div>
+
+                  <div className="row mb-3 pt-2">
+                    <label className="col-md-3 form-label">Longitude</label>
+                    <div className="col-md-6 d-flex align-items-center gap-2">
+                      <input
+                        type="number"
+                        step="any"
+                        className="form-control w-auto"
+                        value={newFlight.longitude}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, longitude: e.target.value })
+                        }
+                      />
+                      <span className="text-muted">deg</span>
+                    </div>
+                  </div>
+
+                  <div className="row mb-3 pt-2">
+                    <label className="col-md-3 form-label">Heading</label>
+                    <div className="col-md-6 d-flex align-items-center gap-2">
+                      <input
+                        type="number"
+                        step="any"
+                        className="form-control w-auto"
+                        value={newFlight.heading}
+                        onChange={(e) =>
+                          setNewFlight({ ...newFlight, heading: e.target.value })
+                        }
+                      />
+                      <span className="text-muted">deg</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={addSimulatedFlight}
+                    >
+                      Add Flight
+                    </button>
+                  </div>
+
+                  <h4>Simulated Flights</h4>
+                  <p>
+                    *NOTE: Altitude is converted to feet and speed is converted to
+                    knots.
+                  </p>
+                  <div className="table-responsive">
+                    <table className="table table-striped table-bordered table-light">
+                      <thead className="thead-dark">
+                        <tr>
+                          <th>Flight Number</th>
+                          <th>Altitude (feet)</th>
+                          <th>Speed (knots)</th>
+                          <th>Latitude (deg)</th>
+                          <th>Longitude (deg)</th>
+                          <th>Heading (deg)</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {simulatedFlights.map((flight: any, index: number) => (
+                          <tr key={index}>
+                            <td>{flight.flightNumber}</td>
+                            <td>{flight.altitude}</td>
+                            <td>{flight.speed}</td>
+                            <td>{flight.latitude}</td>
+                            <td>{flight.longitude}</td>
+                            <td>{flight.heading}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-danger btn-sm"
+                                onClick={() => removeSimulatedFlight(index)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+              <div>
+                <button type="submit" className="btn btn-primary navy-background">
+                  Submit
+                </button>
+              </div>
+            </form>
+            <FlightTable data={flightData} />
+            <FovDisplay
+              isLoading={isLoading}
+              flightData={flightData}
+              isFlightDataEmpty={isFlightDataEmpty}
+              fovCenterRA={fovCenterRA}
+              fovCenterDec={fovCenterDec}
+              visibleFlights={visibleFlights}
+              currentExposureTime={exposureTime}
+              elapsedTime={elapsedTime}
+              remainingTimePercentage={remainingTimePercentage}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+    
   );
 }
 

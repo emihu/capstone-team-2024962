@@ -21,7 +21,6 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
   fovCenterRA,
   fovCenterDec,
   visibleFlights,
-  currentExposureTime,
   elapsedTime,
   remainingTimePercentage,
 }) => {
@@ -38,7 +37,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
         )}
         {!isLoading && isFlightDataEmpty && (
           <Row className="message-box mt-3">
-            <Alert variant="info" className="message">
+            <Alert variant="light" className="message">
               No airplane interference found.
             </Alert>
           </Row>
