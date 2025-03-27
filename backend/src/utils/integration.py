@@ -43,7 +43,6 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     
     # get fov
     fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
-    print("fov size: ", fov_size)
 
     # get horizon
     if flight_data_type == "live":
@@ -52,7 +51,6 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
         #TODO: check return type of flight_data, don't see anywhere that converts it to a list of ProcessedFlightInfo
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
 
-    print("flight_data", flight_data)
     user_gps = {"latitude": observer_lat, "longitude": observer_lon}
     # the ra already have type checkings
     fov_center_ra = HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s) 
@@ -109,9 +107,11 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
     curr_flight_positions = list()
         
+    print("fov center: ", fov_center)
     for flight in flight_data:
 
         flight.RA, flight.Dec = convert_flight_lat_lon_to_ra_dec(flight, updated_time, elapsed_time, user_gps)
+        print("flight RA, Dec: ", flight.RA, flight.Dec)
         
         is_intersecting = fov.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
 
