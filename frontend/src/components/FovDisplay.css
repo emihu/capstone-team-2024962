@@ -14,21 +14,24 @@
 }
 
 .fov-frame {
-    position: relative;  
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    background-color: #151515;
-    /*overflow: hidden;  Prevents planes from flying outside */
-  }
-  
+  position: relative;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background-color: #151515;
+  /*overflow: hidden;  Prevents planes from flying outside */
+}
 
 .message-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: auto;
   height: auto;
   display: flex;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
 }
 
 .pill-title {
