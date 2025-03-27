@@ -115,7 +115,7 @@ def find_live_flights_in_horizon (observer_lat, observer_lon):
 def convert_to_processed_flight(flight_data, flight_number=0):
     return ProcessedFlightInfo(
         id=uuid.uuid4(),  # Generate a unique ID
-        flightNumber=0,
+        flightNumber=flight_data["flightNumber"],
         latitude=float(flight_data["latitude"]),
         longitude=float(flight_data["longitude"]),
         altitude=float(flight_data["altitude"]),  # Already in feet

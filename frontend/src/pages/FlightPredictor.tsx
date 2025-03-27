@@ -37,6 +37,7 @@ function FlightPredictor() {
   const [flightData, setFlightData] = useState<any[]>([]);
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
   const [newFlight, setNewFlight] = useState({
+    flightNumber: "",
     altitude: "",
     altitudeUnit: "m",
     speed: "",
@@ -169,9 +170,10 @@ function FlightPredictor() {
 
     setSimulatedFlights([
       ...simulatedFlights,
-      { ...newFlight, altitude: altitudeValue, speed: speedValue },
+      { ...newFlight, altitude: altitudeValue, speed: speedValue, flightNumber: `SIM${simulatedFlights.length + 1}` },
     ]);
     setNewFlight({
+      flightNumber: "",
       altitude: "",
       altitudeUnit: "m",
       speed: "",
@@ -611,7 +613,7 @@ function FlightPredictor() {
                 <tbody>
                   {simulatedFlights.map((flight: any, index: number) => (
                     <tr key={index}>
-                      <td>{`SIM${index + 1}`}</td>
+                      <td>{flight.flightNumber}</td>
                       <td>{flight.altitude}</td>
                       <td>{flight.speed}</td>
                       <td>{flight.latitude}</td>
