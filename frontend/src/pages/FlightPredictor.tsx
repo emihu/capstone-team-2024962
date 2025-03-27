@@ -29,7 +29,7 @@ function FlightPredictor() {
       altitude: "",
       altitudeUnit: "m",
       flightDataType: "live",
-      datetime: ""
+      datetime: "",
     },
   });
 
@@ -56,7 +56,7 @@ function FlightPredictor() {
   const flightDataType = watch("flightDataType");
 
   const remainingTimePercentage =
-    ((exposureTime - (counter*5)) / exposureTime) * 100;
+    ((exposureTime - counter * 5) / exposureTime) * 100;
 
   const isFlightDataEmpty = Object.values(flightsPosition).every(
     (arr) => arr.length === 0
@@ -88,7 +88,7 @@ function FlightPredictor() {
         "http://127.0.0.1:5000/api/flight-prediction",
         {
           ...formData,
-          simulatedFlights
+          simulatedFlights,
         }
       );
 
@@ -170,7 +170,12 @@ function FlightPredictor() {
 
     setSimulatedFlights([
       ...simulatedFlights,
-      { ...newFlight, altitude: altitudeValue, speed: speedValue, flightNumber: `SIM${simulatedFlights.length + 1}` },
+      {
+        ...newFlight,
+        altitude: altitudeValue,
+        speed: speedValue,
+        flightNumber: `SIM${simulatedFlights.length + 1}`,
+      },
     ]);
     setNewFlight({
       flightNumber: "",
@@ -476,11 +481,11 @@ function FlightPredictor() {
             <div className="row mb-3 pt-2">
               <label className="col-md-3 form-label">Date and Time</label>
               <div className="col-md-6 d-flex align-items-center gap-2">
-              <input
-                type="datetime-local"
-                className="form-control w-auto"
-                {...register("datetime")}
-              />
+                <input
+                  type="datetime-local"
+                  className="form-control w-auto"
+                  {...register("datetime")}
+                />
               </div>
             </div>
 
@@ -596,7 +601,10 @@ function FlightPredictor() {
             </div>
 
             <h4>Simulated Flights</h4>
-            <p>*NOTE: Altitude is converted to feet and speed is converted to knots.</p>
+            <p>
+              *NOTE: Altitude is converted to feet and speed is converted to
+              knots.
+            </p>
             <div className="table-responsive">
               <table className="table table-striped table-bordered table-light">
                 <thead className="thead-dark">
@@ -641,17 +649,23 @@ function FlightPredictor() {
           </button>
         </div>
       </form>
-      <FlightTable data={flightData} />
-      <FovDisplay
-        isLoading={isLoading}
-        flightData={flightData}
-        isFlightDataEmpty={isFlightDataEmpty}
-        fovCenterRA={fovCenterRA}
-        fovCenterDec={fovCenterDec}
-        visibleFlights={visibleFlights}
-        currentExposureTime={exposureTime}
-        remainingTimePercentage={remainingTimePercentage}
-      />
+      {flightData.length === 0 ? (
+        <br></br>
+      ) : (
+        <div>
+          <FlightTable data={flightData} />
+          <FovDisplay
+            isLoading={isLoading}
+            flightData={flightData}
+            isFlightDataEmpty={isFlightDataEmpty}
+            fovCenterRA={fovCenterRA}
+            fovCenterDec={fovCenterDec}
+            visibleFlights={visibleFlights}
+            currentExposureTime={exposureTime}
+            remainingTimePercentage={remainingTimePercentage}
+          />
+        </div>
+      )}
     </div>
   );
 }
