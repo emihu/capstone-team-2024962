@@ -74,7 +74,7 @@ def flightPrediction():
 
     #flights_position = [[{"ID": 1234, "RA": 33, "Dec": 50, "Heading": 0}], [{"ID": 1234, "RA": 33, "Dec": 50, "Heading": 0}], [{"ID": 1234, "RA": 33, "Dec": 50, "Heading": 0}]]
 
-    flight_data = [flight.to_dict() for flight in flight_data]
+    flight_data = [flight.to_dict() for flight in flight_data if flight.entry]
 
     return jsonify({
         "flights_position": flights_position,
