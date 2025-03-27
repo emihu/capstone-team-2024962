@@ -37,9 +37,9 @@ function FlightPredictor() {
   const [flightData, setFlightData] = useState<any[]>([]);
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
   const [newFlight, setNewFlight] = useState({
-    flightNumber: "",
+    flightNumber: `SIM${simulatedFlights.length + 1}`,
     altitude: "",
-    altitudeUnit: "m",
+    altitudeUnit: "ft",
     speed: "",
     speedUnit: "knots",
     latitude: "",
@@ -67,7 +67,7 @@ function FlightPredictor() {
       setCounter((prevCounter) =>
         prevCounter >= flightsPosition.length - 1 ? 0 : prevCounter + 1
       );
-    }, 500);
+    }, 1000);
 
     return () => clearInterval(intervalId);
   }, [flightsPosition]);
@@ -178,9 +178,9 @@ function FlightPredictor() {
       },
     ]);
     setNewFlight({
-      flightNumber: "",
+      flightNumber: `SIM${simulatedFlights.length + 1}`,
       altitude: "",
-      altitudeUnit: "m",
+      altitudeUnit: "ft",
       speed: "",
       speedUnit: "knots",
       latitude: "",
@@ -510,8 +510,8 @@ function FlightPredictor() {
                     setNewFlight({ ...newFlight, altitudeUnit: e.target.value })
                   }
                 >
-                  <option value="m">m</option>
                   <option value="ft">ft</option>
+                  <option value="m">m</option>
                 </select>
               </div>
             </div>
@@ -649,23 +649,17 @@ function FlightPredictor() {
           </button>
         </div>
       </form>
-      {flightData.length === 0 ? (
-        <br></br>
-      ) : (
-        <div>
-          <FlightTable data={flightData} />
-          <FovDisplay
-            isLoading={isLoading}
-            flightData={flightData}
-            isFlightDataEmpty={isFlightDataEmpty}
-            fovCenterRA={fovCenterRA}
-            fovCenterDec={fovCenterDec}
-            visibleFlights={visibleFlights}
-            currentExposureTime={exposureTime}
-            remainingTimePercentage={remainingTimePercentage}
-          />
-        </div>
-      )}
+      <FlightTable data={flightData} />
+      <FovDisplay
+        isLoading={isLoading}
+        flightData={flightData}
+        isFlightDataEmpty={isFlightDataEmpty}
+        fovCenterRA={fovCenterRA}
+        fovCenterDec={fovCenterDec}
+        visibleFlights={visibleFlights}
+        currentExposureTime={exposureTime}
+        remainingTimePercentage={remainingTimePercentage}
+      />
     </div>
   );
 }

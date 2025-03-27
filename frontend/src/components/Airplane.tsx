@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Airplane.css"; // Use similar styles as Satellite
 import flightImage from "../assets/Airplane.png"; // Flight image
-//import TooltipCard from "./toolTipCard";
+import AirplaneCard from "./AirplaneCard";
 
 // USE:
 // import AirplaneProps from "./Airplane";
@@ -21,6 +21,7 @@ import flightImage from "../assets/Airplane.png"; // Flight image
 interface AirplaneProps {
     flight: {
       ID: string;  // Flight ID (can be a string or number)
+      FlightNumber: string
       RA: number;  // Right Ascension in degrees
       Dec: number; // Declination in degrees
       Heading: number;
@@ -33,8 +34,8 @@ interface AirplaneProps {
 }
 
 const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
-  const { ID, RA, Dec, Heading } = flight;
-  //const [isHovered, setIsHovered] = useState(false);
+  const { ID, FlightNumber, RA, Dec, Heading } = flight;
+  const [isHovered, setIsHovered] = useState(false);
 
   // Compute relative position in FOV
   const delta_RA = RA - fovCenter.RA;  // Difference from FOV center (degrees)
@@ -54,8 +55,8 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
   return (
     <div
       className="airplane"
-      // onMouseEnter={() => setIsHovered(true)}
-      // onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         position: "absolute",
         top: topPercentage,
@@ -64,7 +65,7 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
       }}
     >
       <img src={flightImage} alt={`Flight ${ID}`} className="airplane-image" style={{ transform: `rotate(${Heading}deg)` }}/>
-      {/* {isHovered && <TooltipCard id={ID} />} */}
+      {isHovered && <AirplaneCard id={ID} flightNumber={FlightNumber}/>}
     </div>
   );
 };

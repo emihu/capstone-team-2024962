@@ -129,7 +129,7 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
         # add position of the flight if in fov
         if flight.id in flights_in_fov:
-            curr_flight_positions.append({"ID": flight.id, "RA": flight.RA, "Dec": flight.Dec, "Heading": flight.heading})
+            curr_flight_positions.append({"ID": flight.id, "FlightNumber": flight.flightNumber, "RA": flight.RA, "Dec": flight.Dec, "Heading": flight.heading})
 
     # add all of the flight positions of flights within the fov at this timestamp
     flights_position.append(curr_flight_positions)
