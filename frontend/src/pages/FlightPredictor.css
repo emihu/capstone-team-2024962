@@ -1,12 +1,25 @@
 .container {
-    margin: 30px;
-  }
-  
-  .input-field {
-    padding-top: 15px;
-  }
-  
-  .btn {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
+  margin: 30px;
+}
+
+.input-field {
+  padding-top: 15px;
+}
+
+.btn {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.navy {
+  color: #213970; 
+}
+
+.navy-background {
+  background-color: #213970; 
+}
+
+.form-check-input:checked {
+  background-color: #213970; /* Navy background */
+  border-color: #213970; /* Keep the border navy */
+}

@@ -4,22 +4,22 @@ import "./About.css";
 
 function About() {
   return (
-    <Container className="mt-5">
+    <Container fluid className="mt-5 mb-5">
       <Row className="justify-content-center">
         <Col md={8}>
           <Card className="p-4 shadow-sm border-0 bg-light">
-            <h2 className="text-center mb-4 navy">About SkyClear</h2>
+            <h2 className="text-center mb-4 navy">About ClearSkies</h2>
             <p className="text-muted text-center">
               Predict and prevent aircraft light trail interference in
               astrophotography.
             </p>
 
             <p>
-              Welcome to SkyClear, a flight prediction tool! This platform is
+              Welcome to ClearSkies, a flight prediction tool! This platform is
               designed to help you analyze and visualize flight paths that may
               interfere with your telescope's fields of view (FOV). Whether
               you're an astronomer, scientist, or astrophotography enthusiast,
-              SkyClear provides accurate real-time flight analysis to prevent
+              ClearSkies provides accurate real-time flight analysis to prevent
               aircraft light trails from impacting the quality of your images.
             </p>
             <h4 className="mt-4 navy">
@@ -35,16 +35,16 @@ function About() {
             </p>
 
             <h4 className="mt-4 navy">
-              <FaPlane className="me-2 navy" /> Why SkyClear?
+              <FaPlane className="me-2 navy" /> Why ClearSkies?
             </h4>
             <p>
-              The idea for SkyClear was born out of the need to eliminate
+              The idea for ClearSkies was born out of the need to eliminate
               aircraft light trail interferences that contaminate and degrade
               the quality of astronomical images. This has become a growing
               concern as global air traffic increased by ~120% from 2020 to
               2023, and is predicted to continue to rise in the future.
               Furthermore, existing methods lower productivity and destroy fine
-              detail in images with a low signal to noise ratio. SkyClear fills
+              detail in images with a low signal to noise ratio. ClearSkies fills
               this gap by using real-time flight predictions to provide a
               preventative solution that addresses the issue of aircraft light
               trail contamination.

@@ -1,16 +1,11 @@
 .airplane {
-    position: absolute;
-    width: 60px;
-    height: auto;
-  }
+  position: absolute;
+  width: 60px;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
 
-  .airplane-image {
-    width: 100%;
-    height: auto;
-  }
-
-  @media screen and (max-width: 768px) {
-    .satellite {
-      width: 60px;
-    }
-  }
+.airplane-image {
+  width: 100%;
+  height: auto;
+}

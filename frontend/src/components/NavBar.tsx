@@ -9,7 +9,7 @@ function NavBar() {
       </nav> */}
       <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand" href="#" style={{color:" #213970"}}>
             <img
               src={logo}
               alt="Logo"
@@ -17,7 +17,7 @@ function NavBar() {
               height="30"
               className="d-inline-block align-text-top me-2"
             />
-            SkyClear
+            ClearSkies
           </a>
           <button
             className="navbar-toggler"

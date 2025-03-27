@@ -11,6 +11,7 @@ interface FovDisplayProps {
   fovCenterDec: number;
   visibleFlights: any; // Replace 'any' with the appropriate type
   currentExposureTime: number;
+  elapsedTime: number;
   remainingTimePercentage: number;
 }
 
@@ -20,7 +21,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
   fovCenterRA,
   fovCenterDec,
   visibleFlights,
-  currentExposureTime,
+  elapsedTime,
   remainingTimePercentage,
 }) => {
   return (
@@ -36,7 +37,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
         )}
         {!isLoading && isFlightDataEmpty && (
           <Row className="message-box mt-3">
-            <Alert variant="info" className="message">
+            <Alert variant="light" className="message">
               No airplane interference found.
             </Alert>
           </Row>
@@ -53,7 +54,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
       {/* Exposure time pill */}
       {!isLoading && (
         <>
-          <div className="pill-title">Next {currentExposureTime} seconds</div>
+          <div className="pill-title">Time elapsed: {elapsedTime} seconds</div>
           <div className="exposure-pill-container">
             <div
               className="exposure-pill"

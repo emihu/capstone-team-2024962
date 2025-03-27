@@ -7,7 +7,7 @@ class ProcessedFlightInfo:
     ProcessedFlightInfo class to represent a flight with processed
     information.
     """
-    def __init__(self, id: uuid.UUID, flightNumber: int, latitude: float, 
+    def __init__(self, id: uuid.UUID, flightNumber: str, latitude: float, 
                  longitude: float, altitude: float, speed: float, heading: float):
         self.id = id
         self.flightNumber = flightNumber
@@ -28,6 +28,7 @@ class ProcessedFlightInfo:
     def to_dict(self):
         """ Convert object to JSON-serializable dictionary. """
         return {
+            "id": self.id,
             "flight_number": self.flightNumber,
             "altitude": self.altitude,
             "heading": self.heading,

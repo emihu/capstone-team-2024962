@@ -3,7 +3,7 @@ import "./HowToUse.css";
 
 function HowToUse() {
   return (
-    <Container className="mt-5">
+    <Container fluid className="mt-5 mb-5">
       <Row className="justify-content-center">
         <Col md={8}>
           <Card className="p-4 shadow-sm border-0 bg-light">
@@ -40,7 +40,7 @@ function HowToUse() {
               Step 3: Submit your data
             </h4>
             <p>
-              Click the <strong>Submit</strong> button to process your input. SkyClear will analyze real-time flight 
+              Click the <strong>Submit</strong> button to process your input. ClearSkies will analyze real-time flight 
               data or use the customized simulated flight data to identify potential interferences.
             </p>
 

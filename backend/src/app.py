@@ -39,7 +39,7 @@ def flightPrediction():
     flights_position, flight_data = find_flights_intersecting (focal_length, camera_sensor_size, barlow_reducer_factor, exposure, fov_center_ra_h, \
                                    fov_center_ra_m, fov_center_ra_s, fov_center_dec, longitude, latitude, altitude, flight_data_type, simulated_flights, simulated_time)
 
-    flight_data = [flight.to_dict() for flight in flight_data]
+    flight_data = [flight.to_dict() for flight in flight_data if flight.entry]
 
     return jsonify({
         "flights_position": flights_position,
