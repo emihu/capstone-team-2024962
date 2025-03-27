@@ -29,6 +29,7 @@ def test_integration():
     observer_elev = 0
 
     simulated_flights = [{
+        "flightNumber": "123",
         "latitude": 0,
         "longitude": 0,
         "altitude": 30000,
