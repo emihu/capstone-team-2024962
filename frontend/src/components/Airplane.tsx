@@ -1,26 +1,11 @@
 import React, { useState } from "react";
-import "./Airplane.css"; // Use similar styles as Satellite
-import flightImage from "../assets/Airplane.png"; // Flight image
+import "./Airplane.css"; 
+import flightImage from "../assets/Airplane.png";
 import AirplaneCard from "./AirplaneCard";
-
-// USE:
-// import AirplaneProps from "./Airplane";
-
-// // Example data from backend
-// const flightsData = [
-//   { ID: "F123", RA: 120.5, Dec: 45.2 },
-//   { ID: "F456", RA: 115.3, Dec: 50.1 },
-// ];
-
-// const fovCenter = { RA: 118.0, Dec: 48.0 };
-
-// {flightsData.map((flight) => (
-//   <Flight key={flight.ID} flight={flight} fovCenter={fovCenter} />
-// ))}
 
 interface AirplaneProps {
     flight: {
-      ID: string;  // Flight ID (can be a string or number)
+      ID: string;  
       FlightNumber: string
       RA: number;  // Right Ascension in degrees
       Dec: number; // Declination in degrees
@@ -52,16 +37,17 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
   const top = 0.5 - y / 2;
   const topPercentage = `${top * 100}%`;
 
+  // const leftPercentage = `${(0.5 + x) * 100}%`;
+  // const topPercentage = `${(0.5 - y) * 100}%`; // Invert Y-axis (CSS top-down)
+
   return (
     <div
       className="airplane"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        position: "absolute",
         top: topPercentage,
         right: rightPercentage,
-        transform: "translate(50%, -50%)"
       }}
     >
       <img src={flightImage} alt={`Flight ${ID}`} className="airplane-image" style={{ transform: `rotate(${Heading}deg)` }}/>

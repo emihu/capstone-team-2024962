@@ -14,16 +14,14 @@
 }
 
 .fov-frame {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 600px;
-  height: 600px;
-  padding: 20px;
-  border-radius: 50%;
-  background-color: #151515;
-}
+    position: relative;  
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background-color: #151515;
+    /*overflow: hidden;  Prevents planes from flying outside */
+  }
+  
 
 .message-box {
   width: auto;
