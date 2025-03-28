@@ -14,7 +14,6 @@ def home ():
 @app.route("/api/flight-prediction", methods=['POST'])
 def flightPrediction():
     data = request.get_json()
-    print("here:", data)
 
     focal_length = float(data.get('focalLength'))
     camera_sensor_size = float(data.get('cameraSensorSize'))
