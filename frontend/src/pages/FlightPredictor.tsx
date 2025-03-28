@@ -54,6 +54,7 @@ function FlightPredictor() {
   const [counter, setCounter] = useState(0);
   const [visibleFlights, setvisibleFlights] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const flightDataType = watch("flightDataType");
 
@@ -67,6 +68,8 @@ function FlightPredictor() {
   );
 
   useEffect(() => {
+    if (isPaused) return; // Don't start interval if paused
+
     const intervalId = setInterval(() => {
       setCounter((prevCounter) =>
         prevCounter >= flightsPosition.length - 1 ? 0 : prevCounter + 1
@@ -74,7 +77,7 @@ function FlightPredictor() {
     }, 300);
 
     return () => clearInterval(intervalId);
-  }, [flightsPosition]);
+  }, [flightsPosition, isPaused]); // Depend on isPaused
 
   useEffect(() => {
     setvisibleFlights(flightsPosition[counter] || []);
@@ -675,6 +678,13 @@ function FlightPredictor() {
               elapsedTime={elapsedTime}
               remainingTimePercentage={remainingTimePercentage}
             />
+            {flightData.length === 0 ? (
+              <br></br>
+            ) : (
+              <button className="btn btn-primary navy-background pause-button" onClick={() => setIsPaused((prev) => !prev)}>
+                {isPaused ? "Resume" : "Pause"}
+              </button>
+            )}
           </Card>
         </Col>
       </Row>
