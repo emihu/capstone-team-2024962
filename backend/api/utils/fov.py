@@ -40,7 +40,7 @@ def haversine(lat1, lon1, lat2, lon2):
 # Determines which simulated flights are inside the boundary.
 def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights):
     simulated_flights = [convert_to_processed_flight(flight, idx) for idx, flight in enumerate(simulated_flights)]
-    print("processed flights: ", simulated_flights, type(simulated_flights))
+
     flight_data = []
     query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
     

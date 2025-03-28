@@ -60,7 +60,6 @@ def find_flights_intersecting (fov_size: float, exposure: float,
     for elapsed_time in range(0, int(exposure), 5): 
         check_intersection(flight_data, user_gps, observer_time, elapsed_time, fov_size, fov_center, flights_in_fov, flights_position)    
 
-    print("done:", flights_position, flight_data)
     return flights_position, flight_data
 
 
@@ -102,11 +101,9 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
 
     curr_flight_positions = list()
         
-    print("fov center: ", fov_center)
     for flight in flight_data:
 
         flight.RA, flight.Dec = convert_flight_lat_lon_to_ra_dec(flight, updated_time, elapsed_time, user_gps)
-        print("flight RA, Dec: ", flight.RA, flight.Dec)
         
         is_intersecting = fov.is_intersecting(flight.RA, flight.Dec, fov_center["RA"], fov_center["Dec"], fov_size)
 
