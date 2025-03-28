@@ -44,8 +44,8 @@ function About() {
               concern as global air traffic increased by ~120% from 2020 to
               2023, and is predicted to continue to rise in the future.
               Furthermore, existing methods lower productivity and destroy fine
-              detail in images with a low signal to noise ratio. ClearSkies fills
-              this gap by using real-time flight predictions to provide a
+              detail in images with a low signal to noise ratio. ClearSkies
+              fills this gap by using real-time flight predictions to provide a
               preventative solution that addresses the issue of aircraft light
               trail contamination.
             </p>
@@ -69,14 +69,15 @@ function About() {
             <p>
               Have questions or suggestions? Reach out to us at{" "}
               <a href="mailto:emilyy.hu@mail.utoronto.ca">
-                emilyy.hu@mail.utoronto.ca, 
+                emilyy.hu@mail.utoronto.ca
               </a>
-              <a href="mailto:l.fan@mail.utoronto.ca">
-              l.fan@mail.utoronto.ca, 
-              </a>
+              ,{" "}
+              <a href="mailto:l.fan@mail.utoronto.ca">l.fan@mail.utoronto.ca</a>
+              , and{" "}
               <a href="mailto:andrewchapman.leung@mail.utoronto.ca">
                 andrewchapman.leung@mail.utoronto.ca
               </a>
+              .
             </p>
           </Card>
         </Col>

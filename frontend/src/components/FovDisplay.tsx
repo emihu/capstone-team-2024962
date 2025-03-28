@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Alert } from "react-bootstrap";
 import Airplane from "./Airplane";
+import Stars from "./Stars";
 import "./FovDisplay.css";
 
 interface FovDisplayProps {
@@ -30,6 +31,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
     <div className="container">
       <div className="fov-title">Field of View</div>
       <div className="fov-frame">
+        <Stars numberOfStars={60} />
         {isLoading && (
           <Row className="message-box mt-3">
             <Alert variant="info" className="message">

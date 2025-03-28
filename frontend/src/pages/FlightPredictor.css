@@ -23,3 +23,10 @@
   background-color: #213970; /* Navy background */
   border-color: #213970; /* Keep the border navy */
 }
+
+.pause-button {
+  margin-top: 0px;
+  width: 150px;
+  margin-left: 53%;
+  transform: translate(-50%, 0%);
+}
