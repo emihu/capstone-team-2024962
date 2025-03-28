@@ -34,14 +34,14 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
         <Stars numberOfStars={60} />
         {isLoading && (
           <Row className="message-box mt-3">
-            <Alert variant="info" className="message">
+            <Alert variant="light" className="message">
               Scanning the sky...
             </Alert>
           </Row>
         )}
         {!isLoading && isFlightDataEmpty && (
           <Row className="message-box mt-3">
-            <Alert variant="light" className="message">
+            <Alert variant="success" className="message">
               No airplane interference found.
             </Alert>
           </Row>

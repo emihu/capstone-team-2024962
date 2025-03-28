@@ -115,13 +115,16 @@ function FlightPredictor() {
     }
   };
 
-  const onSubmit = (formData: any) => {
+  const onSubmit = async (formData: any) => {
     if (Object.entries(formData).some(([key, val]) => val === "" && key !== "datetime")) {
       alert("Error: All fields must be filled out.");
       return;
     }
     
     setIsLoading(true);
+    if (formData.flightDataType === "live") {
+      formData.datetime = "";
+    }
     if (formData.altitudeUnit === "ft") {
       formData.altitude = (parseFloat(formData.altitude) * 0.3048).toString();
     }
@@ -132,7 +135,7 @@ function FlightPredictor() {
         (formData.fovCenterRaS * 15) / 3600
     );
     setfovCenterDec(formData.fovCenterDec);
-    fetchFlightData(formData);
+    await fetchFlightData(formData);
     setIsLoading(false);
   };
 
