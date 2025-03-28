@@ -122,6 +122,9 @@ function FlightPredictor() {
     }
     
     setIsLoading(true);
+    if (formData.flightDataType === "live") {
+      formData.datetime = "";
+    }
     if (formData.altitudeUnit === "ft") {
       formData.altitude = (parseFloat(formData.altitude) * 0.3048).toString();
     }
