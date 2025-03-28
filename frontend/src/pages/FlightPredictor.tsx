@@ -36,6 +36,7 @@ function FlightPredictor() {
 
   const [flightsPosition, setFlightsPosition] = useState<any[]>([]);
   const [flightData, setFlightData] = useState<any[]>([]);
+  const [fovSize, setFovSize] = useState<number>(0);
   const [simulatedFlights, setSimulatedFlights] = useState<any[]>([]);
   const [newFlight, setNewFlight] = useState({
     flightNumber: `SIM${simulatedFlights.length + 1}`,
@@ -96,13 +97,15 @@ function FlightPredictor() {
       );
 
       // Extract the returned data
-      const { flights_position, flight_data } = response.data;
+      const { flights_position, flight_data, fov_size } = response.data;
 
       // Set the state variables
       setFlightsPosition(flights_position);
       setFlightData(flight_data);
+      setFovSize(fov_size);
       console.log(flights_position);
       console.log(flight_data);
+      console.log(fov_size);
     } catch (error) {
       console.error("Error fetching flight data:", error);
     }
@@ -662,6 +665,7 @@ function FlightPredictor() {
               isFlightDataEmpty={isFlightDataEmpty}
               fovCenterRA={fovCenterRA}
               fovCenterDec={fovCenterDec}
+              fovSize={fovSize}
               visibleFlights={visibleFlights}
               currentExposureTime={exposureTime}
               elapsedTime={elapsedTime}
