@@ -23,8 +23,13 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   // Compute relative position in FOV
-  const delta_RA = RA - fovCenter.RA;  // Difference from FOV center (degrees)
-  const delta_Dec = Dec - fovCenter.Dec;  // Difference from FOV center (degrees)
+  var delta_RA = RA - fovCenter.RA;  // Difference from FOV center (degrees)
+  if (delta_RA > 180) {
+    delta_RA = -(360 - delta_RA);
+  } else if (delta_RA < -180) {
+    delta_RA = 360 + delta_RA;
+  }
+  var delta_Dec = Dec - fovCenter.Dec;  // Difference from FOV center (degrees)
 
   // Convert RA/Dec offsets into FOV frame coordinates
   const x = delta_RA / fovCenter.Size; // Normalize for display
