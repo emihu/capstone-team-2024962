@@ -3,3 +3,4 @@
 src/__pycache__
 src/utils/__pycache__
 test/test_functions/__pycache__
+.vercel
