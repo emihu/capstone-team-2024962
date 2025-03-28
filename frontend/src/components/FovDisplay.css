@@ -19,7 +19,7 @@
   height: 600px;
   border-radius: 50%;
   background-color: #151515;
-  /*overflow: hidden;  Prevents planes from flying outside */
+  overflow: hidden; /* Prevents planes from flying outside */
 }
 
 .message-box {

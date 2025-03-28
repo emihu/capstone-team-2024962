@@ -9,6 +9,7 @@ interface FovDisplayProps {
   isFlightDataEmpty: boolean;
   fovCenterRA: number;
   fovCenterDec: number;
+  fovSize: number;
   visibleFlights: any; // Replace 'any' with the appropriate type
   currentExposureTime: number;
   elapsedTime: number;
@@ -20,6 +21,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
   isFlightDataEmpty,
   fovCenterRA,
   fovCenterDec,
+  fovSize,
   visibleFlights,
   elapsedTime,
   remainingTimePercentage,
@@ -47,7 +49,7 @@ const FovDisplay: React.FC<FovDisplayProps> = ({
             <Airplane
               key={index}
               flight={flight}
-              fovCenter={{ RA: fovCenterRA, Dec: fovCenterDec, Size: 3 }}
+              fovCenter={{ RA: fovCenterRA, Dec: fovCenterDec, Size: fovSize }}
             />
           ))}
       </div>
