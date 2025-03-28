@@ -113,6 +113,11 @@ function FlightPredictor() {
   };
 
   const onSubmit = (formData: any) => {
+    if (Object.entries(formData).some(([key, val]) => val === "" && key !== "datetime")) {
+      alert("Error: All fields must be filled out.");
+      return;
+    }
+    
     setIsLoading(true);
     if (formData.altitudeUnit === "ft") {
       formData.altitude = (parseFloat(formData.altitude) * 0.3048).toString();
@@ -130,8 +135,6 @@ function FlightPredictor() {
 
   const addSimulatedFlight = () => {
     if (Object.values(newFlight).some((val) => val === "")) {
-      console.log(Object.values(newFlight));
-
       alert("Error: All fields must be filled out.");
       return;
     }
