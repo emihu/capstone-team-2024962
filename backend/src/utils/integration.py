@@ -9,14 +9,12 @@ from utils.constants import EARTH_RADIUS_METER
 from datetime import datetime
 # todo: create data class
 #TODO: HMS should directly be input to this class to get type checkings
-def find_flights_intersecting (focal_length: float, camera_sensor_size: float, barlow_reducer_factor: float, exposure: float, 
+def find_flights_intersecting (fov_size: float, exposure: float, 
                                fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float,
                                observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time: datetime | None = None):
     """
     Function to find flights intersecting the field of view of the telescope.
-    :param focal_length: The focal length of the telescope.
-    :param camera_sensor_size: The size of the camera sensor.
-    :param barlow_reducer_factor: The barlow reducer factor.
+    :param fov_size: The field of view size.
     :param exposure: The exposure time.
     :param fov_center_ra_h: The Right Ascension of the center of the field of view in hours.
     :param fov_center_ra_m: The Right Ascension of the center of the field of view in minutes.
@@ -41,9 +39,6 @@ def find_flights_intersecting (focal_length: float, camera_sensor_size: float, b
     if flight_data_type == "simulated" and simulated_flights is None:
         raise ValueError("Simulated flights must be provided")
     
-    # get fov
-    fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
-
     # get horizon
     if flight_data_type == "live":
         flight_data = fov.find_live_flights_in_horizon(observer_lat, observer_lon)
