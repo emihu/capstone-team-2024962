@@ -1,33 +1,28 @@
 .tooltip-card {
-    background-color: black;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    width: max-content;
-  }
-  
-  .tooltip-row {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .tooltip-title {
-    margin-right: 5px;
-    font-weight: 700;
-    color: #5c5a5a;
-  }
-  
-  .tooltip-value {
-    text-align: right;
-    font-weight: 300;
-    color: white;
-    margin-left: 40px;
-  }
+  position: absolute;
+  top: -55px; 
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgb(89, 89, 89);
+  padding: 8px;
+  border-radius: 5px;
+  z-index: -10; 
+  font-size: 12px;
+  width: max-content;
+}
 
-  .vertical-line {
-    width: 1px;
-    height: 80%;
-    color: white;
-    margin: 0 5px;
-  }
+
+.tooltip-row {
+  display: flex;
+}
+
+.tooltip-title {
+  margin-right: 5px;
+  font-weight: 700;
+  color: #ffffffb1;
+}
+
+.tooltip-value {
+  font-weight: 300;
+  color: white;
+}
