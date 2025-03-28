@@ -13,7 +13,7 @@ jobs:
       run:
         working-directory: ${{ github.workspace }}/backend
     env:
-      PYTHONPATH: ${{ github.workspace }}/backend/src
+      PYTHONPATH: ${{ github.workspace }}/backend/api
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
