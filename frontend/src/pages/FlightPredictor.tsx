@@ -88,8 +88,9 @@ function FlightPredictor() {
 
     try {
       console.log("Fetching flight data...", formData);
+      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000/api/flight-prediction";
       const response = await axios.post(
-        "http://127.0.0.1:5000/api/flight-prediction",
+        apiUrl,
         {
           ...formData,
           simulatedFlights,
