@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from utils.integration import find_flights_intersecting
+import utils.fov as fov
 from astropy.time import Time, TimeDelta
 
 app = Flask(__name__)
@@ -35,11 +36,16 @@ def flightPrediction():
     else:
         simulated_time = Time(simulated_time)
 
-    print("simulated time: ", type(simulated_time), simulated_time)
-    flights_position, flight_data = find_flights_intersecting (focal_length, camera_sensor_size, barlow_reducer_factor, exposure, fov_center_ra_h, \
-                                   fov_center_ra_m, fov_center_ra_s, fov_center_dec, longitude, latitude, altitude, flight_data_type, simulated_flights, simulated_time)
+    fov_size = fov.calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor)
 
-    flight_data = [flight.to_dict() for flight in flight_data if flight.entry]
+    flights_position, flight_data = find_flights_intersecting (fov_size, exposure, fov_center_ra_h, fov_center_ra_m, 
+                                                               fov_center_ra_s, fov_center_dec, longitude, latitude, altitude, flight_data_type, simulated_flights, simulated_time)
+
+    flight_data : list = []
+    for flight in flight_data:
+        if flight.entry:
+            flight_data.append(flight.to_dict())
+            flight_data["fov_size"] = fov_size
 
     return jsonify({
         "flights_position": flights_position,

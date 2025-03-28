@@ -4,7 +4,10 @@ from utils.datatypes import ProcessedFlightInfo
 import uuid
 from utils.constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT
 
-def calculate_fov_size(focal_length, camera_sensor_size, barlow_reducer_factor):
+def calculate_fov_size(focal_length : float, camera_sensor_size : float, barlow_reducer_factor : float) -> float:
+    """
+    Calculate the field of view size of a telescope.
+    """
     # calculate the FOV size
     fov_size = ((180/math.pi)/(focal_length*barlow_reducer_factor))*camera_sensor_size
 
