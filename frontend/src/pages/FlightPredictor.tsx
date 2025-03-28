@@ -115,7 +115,7 @@ function FlightPredictor() {
     }
   };
 
-  const onSubmit = (formData: any) => {
+  const onSubmit = async (formData: any) => {
     if (Object.entries(formData).some(([key, val]) => val === "" && key !== "datetime")) {
       alert("Error: All fields must be filled out.");
       return;
@@ -135,7 +135,7 @@ function FlightPredictor() {
         (formData.fovCenterRaS * 15) / 3600
     );
     setfovCenterDec(formData.fovCenterDec);
-    fetchFlightData(formData);
+    await fetchFlightData(formData);
     setIsLoading(false);
   };
 
