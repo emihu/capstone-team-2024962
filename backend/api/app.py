@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from utils.integration import find_flights_intersecting
+from utils.localsidereal import get_local_time
 import utils.fov as fov
 from astropy.time import Time, TimeDelta
 
@@ -31,7 +32,7 @@ def flightPrediction():
     simulated_flights = data.get('simulatedFlights')
     
     if simulated_time == "":
-        observer_time = Time.now()
+        observer_time = get_local_time()
     else:
         observer_time = Time(simulated_time)
 

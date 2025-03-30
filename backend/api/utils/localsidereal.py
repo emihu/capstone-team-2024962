@@ -28,3 +28,11 @@ def get_local_sidereal_time(lat: float, lon: float, time: datetime = None) -> fl
     observing_time = Time(time, scale='utc', location=observing_location)
     LST = observing_time.sidereal_time('mean')
     return LST.rad
+
+def get_local_time(lat: float, lon: float) -> float:
+    tf = TimezoneFinder()
+    tz = tf.timezone_at(lng=lon, lat=lat)
+    tz_target = timezone(tz)
+    today = datetime.now()
+    local_time = tz_target.localize(today)
+    return Time(local_time)
