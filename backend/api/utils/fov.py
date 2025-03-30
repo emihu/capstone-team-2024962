@@ -2,7 +2,7 @@ import math
 import utils.flight_api as fa
 from utils.datatypes import ProcessedFlightInfo
 import uuid
-from utils.constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT
+from utils.constants import EARTH_RADIUS_METER, AIRPLANE_MAX_ALT, AIRPLANE_MAX_SPEED
 
 def calculate_fov_size(focal_length : float, camera_sensor_size : float, barlow_reducer_factor : float) -> float:
     """
@@ -13,7 +13,6 @@ def calculate_fov_size(focal_length : float, camera_sensor_size : float, barlow_
 
     return fov_size
 
-# what distance to use? typical altitude of planes?
 def fov_degrees_to_meters(fov_degrees, distance_meters):    
     # convert FOV from degrees to radians
     fov_radians = math.radians(fov_degrees)
@@ -55,9 +54,9 @@ def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flig
         
     return flight_data
 
-def find_live_flights_in_horizon (fov_size, observer_lat, observer_lon):
-    #query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
-    query_radius = fov_degrees_to_meters(fov_size, AIRPLANE_MAX_ALT) + 53100
+def find_live_flights_in_horizon (observer_lat, observer_lon, fov_size, exposure_time):
+    # multiply by 1.5 for extra safety margin
+    query_radius = (fov_degrees_to_meters(fov_size, AIRPLANE_MAX_ALT) + (AIRPLANE_MAX_SPEED * exposure_time/3600)) * 1.5
     flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, query_radius)
 
     return flight_data

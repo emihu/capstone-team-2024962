@@ -41,7 +41,7 @@ def find_flights_intersecting (fov_size: float, exposure: float,
     
     # get horizon
     if flight_data_type == "live":
-        flight_data = fov.find_live_flights_in_horizon(fov_size, observer_lat, observer_lon)
+        flight_data = fov.find_live_flights_in_horizon(observer_lat, observer_lon, fov_size, exposure)
     else:
         #TODO: check return type of flight_data, don't see anywhere that converts it to a list of ProcessedFlightInfo
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
