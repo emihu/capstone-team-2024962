@@ -55,8 +55,9 @@ def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flig
         
     return flight_data
 
-def find_live_flights_in_horizon (observer_lat, observer_lon):
-    query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
+def find_live_flights_in_horizon (fov_size, observer_lat, observer_lon):
+    #query_radius = math.sqrt(math.pow(EARTH_RADIUS_METER + AIRPLANE_MAX_ALT, 2) - math.pow(EARTH_RADIUS_METER, 2))
+    query_radius = fov_degrees_to_meters(fov_size, AIRPLANE_MAX_ALT) + 53100
     flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, query_radius)
 
     return flight_data

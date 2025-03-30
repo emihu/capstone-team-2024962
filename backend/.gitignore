@@ -4,3 +4,4 @@ api/__pycache__
 api/utils/__pycache__
 test/test_functions/__pycache__
 .vercel
+*.pyc
