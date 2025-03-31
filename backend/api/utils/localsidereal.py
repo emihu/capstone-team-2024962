@@ -54,3 +54,21 @@ def get_utc_time(lat: float, lon: float, local_time: str) -> float:
     utc_astropy_time = Time(utc_time, scale='utc')
 
     return utc_astropy_time
+
+def get_local_time(lat: float, lon: float, utc_time: Time) -> Time:
+    # Convert Astropy Time to Python datetime (UTC)
+    utc_time = utc_time.to_datetime(timezone=pytz.utc)
+
+    # Get the timezone for the given latitude and longitude
+    tf = TimezoneFinder()
+    tz_name = tf.timezone_at(lng=lon, lat=lat)  # Find timezone name
+    if tz_name is None:
+        raise ValueError(f"Could not determine timezone for lat: {lat}, lon: {lon}")
+
+    # Get the target timezone
+    tz_target = pytz.timezone(tz_name)
+
+    # Convert UTC time to local time
+    local_time = utc_time.astimezone(tz_target)
+
+    return local_time

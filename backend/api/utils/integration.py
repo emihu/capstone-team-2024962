@@ -1,5 +1,6 @@
 
 from utils.datatypes import ProcessedFlightInfo, HMS
+from utils.localsidereal import get_local_time
 from astropy.time import Time, TimeDelta
 import utils.flight_trajectory as flight_trajectory
 import utils.conversion as conversion
@@ -108,11 +109,12 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
         if is_intersecting:
             if flight.id not in flights_in_fov: # enter time
                 flights_in_fov.add(flight.id)
-                flight.entry = updated_time.to_datetime()
+                print(updated_time, type(updated_time))
+                flight.entry = get_local_time(flight.latitude, flight.longitude, updated_time)
         else:
             if flight.id in flights_in_fov: # exit time
                 flights_in_fov.discard(flight.id)
-                flight.exit = updated_time.to_datetime()
+                flight.exit = get_local_time(flight.latitude, flight.longitude, updated_time) 
 
         # add position of the flight if in fov
         if flight.id in flights_in_fov:
