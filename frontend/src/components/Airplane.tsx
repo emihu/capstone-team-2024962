@@ -32,8 +32,8 @@ const Airplane: React.FC<AirplaneProps> = ({ flight, fovCenter }) => {
   var delta_Dec = Dec - fovCenter.Dec;  // Difference from FOV center (degrees)
 
   // Convert RA/Dec offsets into FOV frame coordinates
-  const x = delta_RA / fovCenter.Size; // Normalize for display
-  const y = delta_Dec / fovCenter.Size; // Normalize for display
+  const x = delta_RA / (fovCenter.Size/2); // Normalize for display
+  const y = delta_Dec / (fovCenter.Size/2); // Normalize for display
 
   // Convert to CSS positioning
   const right = 0.5 - x / 2;
