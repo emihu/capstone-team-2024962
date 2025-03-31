@@ -12,7 +12,7 @@ from datetime import datetime
 #TODO: HMS should directly be input to this class to get type checkings
 def find_flights_intersecting (fov_size: float, exposure: float, 
                                fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float,
-                               observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time = Time):
+                               observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time: Time):
     """
     Function to find flights intersecting the field of view of the telescope.
     :param fov_size: The field of view size.
@@ -109,7 +109,6 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
         if is_intersecting:
             if flight.id not in flights_in_fov: # enter time
                 flights_in_fov.add(flight.id)
-                print(updated_time, type(updated_time))
                 flight.entry = get_local_time(flight.latitude, flight.longitude, updated_time)
         else:
             if flight.id in flights_in_fov: # exit time

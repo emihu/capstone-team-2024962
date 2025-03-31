@@ -32,7 +32,7 @@ def flightPrediction():
     simulated_flights = data.get('simulatedFlights')
     
     if simulated_time == "":
-        observer_time = Time.now()
+        observer_time = Time.now() # gives current time in UTC
     else:
         observer_time = get_utc_time(latitude, longitude, simulated_time)
 
