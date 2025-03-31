@@ -117,7 +117,7 @@ def is_intersecting(ra1, dec1, ra2, dec2, fov_size) -> bool:
         dec1 (float): Declination of the first point (in degrees)
         ra2 (float): Right Ascension of the second point (in degrees)
         dec2 (float): Declination of the second point (in degrees)
-        fov_size (float): Field of view size (in degrees)
+        fov_size (float): Field of view size (in degrees), this is the angle from one end of the FOV to the other end
         
     Returns:
         bool: True if the line of sight intersects with the field of view, False otherwise
@@ -126,4 +126,5 @@ def is_intersecting(ra1, dec1, ra2, dec2, fov_size) -> bool:
     angle = angular_distance(ra1, dec1, ra2, dec2)
     
     # Check if the angular distance is within the field of view
-    return angle < fov_size
+    # fov should be divided by 2, since fov_size is the angle from one end of the FOV to the other end
+    return angle < (fov_size/2)

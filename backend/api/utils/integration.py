@@ -47,7 +47,7 @@ def find_flights_intersecting (fov_size: float, exposure: float,
         #TODO: check return type of flight_data, don't see anywhere that converts it to a list of ProcessedFlightInfo
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
 
-    user_gps = {"latitude": observer_lat, "longitude": observer_lon}
+    user_gps = {"latitude": observer_lat, "longitude": observer_lon, "altitude": altitude}
     # the ra already have type checkings
     fov_center_ra = HMS(fov_center_ra_h, fov_center_ra_m, fov_center_ra_s) 
     fov_center = {"RA": fov_center_ra.to_degrees(), "Dec": fov_center_dec} 
@@ -87,7 +87,7 @@ def convert_flight_lat_lon_to_ra_dec(flight: ProcessedFlightInfo, updated_observ
 
     # TODO: get user altitude from frontend
     return conversion.aircraft_theta_phi_to_radec(
-        theta, phi, flight_alt, user_gps["latitude"], user_gps["longitude"], 0, updated_observer_time)
+        theta, phi, flight_alt, user_gps["latitude"], user_gps["longitude"], user_gps["altitude"], updated_observer_time)
 
     
 
