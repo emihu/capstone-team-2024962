@@ -1,5 +1,6 @@
 
 from utils.datatypes import ProcessedFlightInfo, HMS
+from utils.localsidereal import get_local_time
 from astropy.time import Time, TimeDelta
 import utils.flight_trajectory as flight_trajectory
 import utils.conversion as conversion
@@ -11,7 +12,7 @@ from datetime import datetime
 #TODO: HMS should directly be input to this class to get type checkings
 def find_flights_intersecting (fov_size: float, exposure: float, 
                                fov_center_ra_h: float, fov_center_ra_m: float, fov_center_ra_s: float, fov_center_dec: float,
-                               observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time: datetime | None = None):
+                               observer_lon: float, observer_lat: float, altitude: float, flight_data_type: str, simulated_flights, simulated_time: Time):
     """
     Function to find flights intersecting the field of view of the telescope.
     :param fov_size: The field of view size.
@@ -41,7 +42,7 @@ def find_flights_intersecting (fov_size: float, exposure: float,
     
     # get horizon
     if flight_data_type == "live":
-        flight_data = fov.find_live_flights_in_horizon(observer_lat, observer_lon)
+        flight_data = fov.find_live_flights_in_horizon(observer_lat, observer_lon, fov_size, exposure)
     else:
         #TODO: check return type of flight_data, don't see anywhere that converts it to a list of ProcessedFlightInfo
         flight_data = fov.find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flights)
@@ -56,9 +57,8 @@ def find_flights_intersecting (fov_size: float, exposure: float,
     flights_position = list()
 
     #TODO: play around with the timestep
-    observer_time = None if simulated_time is None else simulated_time
     for elapsed_time in range(0, int(exposure), 5): 
-        check_intersection(flight_data, user_gps, observer_time, elapsed_time, fov_size, fov_center, flights_in_fov, flights_position)    
+        check_intersection(flight_data, user_gps, simulated_time, elapsed_time, fov_size, fov_center, flights_in_fov, flights_position)    
 
     return flights_position, flight_data
 
@@ -91,10 +91,8 @@ def convert_flight_lat_lon_to_ra_dec(flight: ProcessedFlightInfo, updated_observ
 
     
 
-def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[str, float], observer_time: Time | None, \
+def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[str, float], observer_time: Time, \
                        elapsed_time: int, fov_size: float, fov_center: dict[str, float], flights_in_fov: set, flights_position: list):
-    if observer_time is None:
-        observer_time = Time.now()
     #calculate the updated time after the elapsed time
     delta = TimeDelta(elapsed_time, format='sec')
     updated_time = observer_time + delta
@@ -111,11 +109,11 @@ def check_intersection(flight_data: list[ProcessedFlightInfo], user_gps: dict[st
         if is_intersecting:
             if flight.id not in flights_in_fov: # enter time
                 flights_in_fov.add(flight.id)
-                flight.entry = updated_time.to_datetime()
+                flight.entry = get_local_time(flight.latitude, flight.longitude, updated_time)
         else:
             if flight.id in flights_in_fov: # exit time
                 flights_in_fov.discard(flight.id)
-                flight.exit = updated_time.to_datetime()
+                flight.exit = get_local_time(flight.latitude, flight.longitude, updated_time) 
 
         # add position of the flight if in fov
         if flight.id in flights_in_fov:

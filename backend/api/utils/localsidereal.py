@@ -1,3 +1,4 @@
+import pytz
 from astropy.coordinates import EarthLocation
 from astropy.time import Time
 from astropy import units as u
@@ -28,3 +29,46 @@ def get_local_sidereal_time(lat: float, lon: float, time: datetime = None) -> fl
     observing_time = Time(time, scale='utc', location=observing_location)
     LST = observing_time.sidereal_time('mean')
     return LST.rad
+
+def get_utc_time(lat: float, lon: float, local_time: str) -> float:
+    # Convert string to datetime
+    local_time = datetime.strptime(local_time, "%Y-%m-%dT%H:%M")
+
+    # Get the timezone for the given latitude and longitude
+    tf = TimezoneFinder()
+    tz_name = tf.timezone_at(lng=lon, lat=lat)  # Find timezone name
+    if tz_name is None:
+        raise ValueError(f"Could not determine timezone for lat: {lat}, lon: {lon}")
+    
+    # Get the target timezone
+    tz_target = timezone(tz_name)
+    
+    # Localize the local time (if it's naive)
+    if local_time.tzinfo is None:
+        local_time = tz_target.localize(local_time)  # Localize if naive time is passed
+
+    # Convert local time to UTC
+    utc_time = local_time.astimezone(pytz.utc)
+
+    # Convert to astropy Time object
+    utc_astropy_time = Time(utc_time, scale='utc')
+
+    return utc_astropy_time
+
+def get_local_time(lat: float, lon: float, utc_time: Time) -> Time:
+    # Convert Astropy Time to Python datetime (UTC)
+    utc_time = utc_time.to_datetime(timezone=pytz.utc)
+
+    # Get the timezone for the given latitude and longitude
+    tf = TimezoneFinder()
+    tz_name = tf.timezone_at(lng=lon, lat=lat)  # Find timezone name
+    if tz_name is None:
+        raise ValueError(f"Could not determine timezone for lat: {lat}, lon: {lon}")
+
+    # Get the target timezone
+    tz_target = pytz.timezone(tz_name)
+
+    # Convert UTC time to local time
+    local_time = utc_time.astimezone(tz_target)
+
+    return local_time
