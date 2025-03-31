@@ -57,9 +57,14 @@ def find_simulated_flights_in_horizon(observer_lat, observer_lon, simulated_flig
 def find_live_flights_in_horizon (observer_lat, observer_lon, fov_size, exposure_time):
     # multiply by 1.5 for extra safety margin
     query_radius = (fov_degrees_to_meters(fov_size, AIRPLANE_MAX_ALT) + (AIRPLANE_MAX_SPEED * exposure_time/3600)) * 1.5
-    flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, query_radius)
-
+    flight_data = fa.find_flights_in_circ_boundary(observer_lat, observer_lon, query_radius)    
     return flight_data
+
+def remove_ground_flights(flight_data: list[ProcessedFlightInfo]):
+    """
+    remove flights that are on the ground
+    """
+    return [flight for flight in flight_data if flight.altitude > 1000]  # Filter out flights with altitude <= 1000 feet
 
 def convert_to_processed_flight(flight_data, flight_number=0):
     return ProcessedFlightInfo(
